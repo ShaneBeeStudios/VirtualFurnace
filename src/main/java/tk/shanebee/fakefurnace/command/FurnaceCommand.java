@@ -7,10 +7,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import tk.shanebee.fakefurnace.FakeFurnace;
 import tk.shanebee.fakefurnace.FurnaceManager;
 import tk.shanebee.fakefurnace.machine.Furnace;
+import tk.shanebee.fakefurnace.util.Util;
 
 import java.util.UUID;
 
@@ -58,7 +60,13 @@ public class FurnaceCommand implements CommandExecutor {
                         }
                         switch (args[1]) {
                             case "new":
-                                player.getInventory().addItem(this.furnaceManager.createItemWithFurnace("&3Portable Furnace", Material.FURNACE, true));
+                                ItemStack itemStack = new ItemStack(Material.FURNACE);
+                                String name = "&3Portable Furnace";
+                                ItemMeta meta = itemStack.getItemMeta();
+                                assert meta != null;
+                                meta.setDisplayName(Util.getColString(name));
+                                itemStack.setItemMeta(meta);
+                                player.getInventory().addItem(this.furnaceManager.createItemWithFurnace(name, itemStack, true));
                                 break;
                             case "clone":
                                 ItemStack item = player.getInventory().getItemInMainHand();
