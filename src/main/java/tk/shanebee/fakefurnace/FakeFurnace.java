@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Tag;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 import tk.shanebee.fakefurnace.command.FurnaceCommand;
@@ -79,6 +78,7 @@ public class FakeFurnace extends JavaPlugin {
     }
 
     private void registerFuels() {
+        /* KEEP for examples
         Fuel coal = new Fuel(getKey("coal"), Material.COAL, 1600);
         Fuel charcoal = new Fuel(getKey("charcoal"), Material.CHARCOAL, 1000);
         Fuel planks = new Fuel(getKey("planks"), Tag.PLANKS, 100);
@@ -86,6 +86,10 @@ public class FakeFurnace extends JavaPlugin {
         this.recipeManager.registerFuel(coal);
         this.recipeManager.registerFuel(charcoal);
         this.recipeManager.registerFuel(planks);
+         */
+        for (Fuel fuel : Fuel.getVanillaFuels()) {
+            this.recipeManager.registerFuel(fuel);
+        }
     }
 
     /**
