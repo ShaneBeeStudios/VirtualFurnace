@@ -15,6 +15,7 @@ import tk.shanebee.fakefurnace.FakeFurnace;
 import tk.shanebee.fakefurnace.RecipeManager;
 import tk.shanebee.fakefurnace.recipe.Fuel;
 import tk.shanebee.fakefurnace.recipe.FurnaceRecipe;
+import tk.shanebee.fakefurnace.util.Util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     private final Inventory inventory;
 
     public Furnace(String name) {
-        this.name = ChatColor.stripColor(name);
+        this.name = name;
         this.uuid = UUID.randomUUID();
         this.recipeManager = FakeFurnace.getPlugin().getRecipeManager();
         this.cookTime = 0;
@@ -49,7 +50,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         this.fuel = null;
         this.input = null;
         this.output = null;
-        this.inventory = Bukkit.createInventory(this, InventoryType.FURNACE, name);
+        this.inventory = Bukkit.createInventory(this, InventoryType.FURNACE, Util.getColString(name));
         this.updateInventory();
     }
 
@@ -75,7 +76,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         } else {
             this.fuelTimeTotal = 0;
         }
-        this.inventory = Bukkit.createInventory(this, InventoryType.FURNACE, name);
+        this.inventory = Bukkit.createInventory(this, InventoryType.FURNACE, Util.getColString(name));
         this.updateInventory();
     }
 
@@ -221,7 +222,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     @Override
     public String toString() {
         return "FakeFurnace{" +
-                "name='" + name + '\'' +
+                "name='" + ChatColor.stripColor(name) + '\'' +
                 ", uuid=" + uuid +
                 ", cookTime=" + cookTime +
                 ", fuelTime=" + fuelTime +
@@ -232,7 +233,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("name", this.name);
-        result.put("uuid", this.uuid);
+        result.put("uuid", this.uuid.toString());
         result.put("cookTime", this.cookTime);
         result.put("fuelTime", this.fuelTime);
         result.put("fuel", this.fuel);
