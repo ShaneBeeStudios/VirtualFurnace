@@ -137,13 +137,13 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
             } else {
                 this.cookTime = 0;
             }
-        } else {
-            if (canBurn() && canCook()) {
-                processBurn();
+        } else if (canBurn() && canCook()) {
+            processBurn();
+        } else if (this.cookTime > 0) {
+            if (canCook()) {
+                this.cookTime -= 5;
             } else {
-                if (canCook() && this.cookTime > 0) {
-                    this.cookTime -= 10;
-                }
+                this.cookTime = 0;
             }
         }
         updateInventoryView();
@@ -151,7 +151,6 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
 
     private boolean canBurn() {
         if (this.fuel == null) return false;
-        //return Fuel.getByFuel(this.fuel.getType()) != null;
         return this.recipeManager.getFuelByMaterial(this.fuel.getType()) != null;
     }
 
