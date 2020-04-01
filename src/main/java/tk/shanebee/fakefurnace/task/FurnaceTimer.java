@@ -7,7 +7,7 @@ import tk.shanebee.fakefurnace.machine.Furnace;
 
 public class FurnaceTimer extends BukkitRunnable {
 
-    private FurnaceManager furnaceManager;
+    private final FurnaceManager furnaceManager;
     private int tick;
 
     public FurnaceTimer(FakeFurnace plugin) {
@@ -18,11 +18,11 @@ public class FurnaceTimer extends BukkitRunnable {
 
     @Override
     public void run() {
-        tick++;
         for (Furnace furnace : this.furnaceManager.getFurnaceMap().values()) {
             furnace.tick();
         }
-        if (tick >= 100) {
+        tick++;
+        if (tick >= 6000) {
             this.furnaceManager.saveAll();
             this.tick = 0;
         }
