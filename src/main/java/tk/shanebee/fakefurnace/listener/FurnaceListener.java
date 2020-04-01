@@ -20,7 +20,7 @@ public class FurnaceListener implements Listener {
 
     public FurnaceListener(FakeFurnace plugin) {
         this.plugin = plugin;
-        this.key = new NamespacedKey(plugin, "furnace");
+        this.key = new NamespacedKey(plugin, "furnaceID");
     }
 
     @EventHandler
