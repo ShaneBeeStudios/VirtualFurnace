@@ -1,0 +1,4 @@
+main: tk.shanebee.fakefurnace.FakeFurnace
+name: FakeFurnace
+version: '${project.version}'
+author: ShaneBee
