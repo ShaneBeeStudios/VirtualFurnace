@@ -2,6 +2,7 @@ package tk.shanebee.fakefurnace;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
 import tk.shanebee.fakefurnace.recipe.Fuel;
 import tk.shanebee.fakefurnace.recipe.FurnaceRecipe;
 
@@ -70,9 +71,9 @@ public class RecipeManager {
      * @param material Material of Fuel to grab
      * @return Fuel from recipe
      */
-    public Fuel getByMaterial(Material material) {
+    public Fuel getFuelByMaterial(Material material) {
         for (Fuel fuel : this.fuelMap.values()) {
-            if (fuel.getFuel() == material) {
+            if (fuel.matchFuel(material)) {
                 return fuel;
             }
         }

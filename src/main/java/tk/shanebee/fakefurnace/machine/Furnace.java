@@ -70,7 +70,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         } else {
             this.cookTimeTotal = 0;
         }
-        Fuel fuelF = recipeManager.getByMaterial(fuel != null ? fuel.getType() : null);
+        Fuel fuelF = recipeManager.getFuelByMaterial(fuel != null ? fuel.getType() : null);
         if (fuelF != null) {
             this.fuelTimeTotal = fuelF.getBurnTime();
         } else {
@@ -152,11 +152,11 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     private boolean canBurn() {
         if (this.fuel == null) return false;
         //return Fuel.getByFuel(this.fuel.getType()) != null;
-        return this.recipeManager.getByMaterial(this.fuel.getType()) != null;
+        return this.recipeManager.getFuelByMaterial(this.fuel.getType()) != null;
     }
 
     private void processBurn() {
-        Fuel fuel = this.recipeManager.getByMaterial(this.fuel.getType());
+        Fuel fuel = this.recipeManager.getFuelByMaterial(this.fuel.getType());
         if (fuel == null) return;
         int fuelAmount = this.fuel.getAmount();
         if (fuelAmount > 1) {
