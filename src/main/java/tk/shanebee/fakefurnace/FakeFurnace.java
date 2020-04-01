@@ -7,16 +7,20 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 import tk.shanebee.fakefurnace.recipe.Fuel;
 import tk.shanebee.fakefurnace.recipe.FurnaceRecipe;
-import tk.shanebee.fakefurnace.recipe.Recipe;
 
+/**
+ * Main class for FakeFurnace
+ */
 @SuppressWarnings("unused")
 public class FakeFurnace extends JavaPlugin {
 
     private static FakeFurnace instance;
+    private RecipeManager recipeManager;
 
     @Override
     public void onEnable() {
         instance = this;
+        this.recipeManager = new RecipeManager(this);
         log("Loading recipes...");
         registerRecipes();
         log("Recipes loaded &asuccessfully!");
@@ -34,28 +38,52 @@ public class FakeFurnace extends JavaPlugin {
         FurnaceRecipe chicken = new FurnaceRecipe(getKey("chicken"), Material.CHICKEN, Material.COOKED_CHICKEN, 200);
         FurnaceRecipe beef = new FurnaceRecipe(getKey("beef"), Material.BEEF, Material.COOKED_BEEF, 100);
 
-        Recipe.registerFurnaceRecipe(chicken);
-        Recipe.registerFurnaceRecipe(beef);
+        this.recipeManager.registerFurnaceRecipe(chicken);
+        this.recipeManager.registerFurnaceRecipe(beef);
     }
 
     private void registerFuels() {
         Fuel coal = new Fuel(getKey("coal"), Material.COAL, 1600);
         Fuel charcoal = new Fuel(getKey("charcoal"), Material.CHARCOAL, 1000);
 
-        Recipe.registerFuel(coal);
-        Recipe.registerFuel(charcoal);
+        this.recipeManager.registerFuel(coal);
+        this.recipeManager.registerFuel(charcoal);
     }
 
+    /**
+     * Register a new {@link FurnaceRecipe}
+     *
+     * @param recipe new FurnaceRecipe to register
+     */
     public static void registerFurnaceRecipe(FurnaceRecipe recipe) {
-        Recipe.registerFurnaceRecipe(recipe);
+        instance.recipeManager.registerFurnaceRecipe(recipe);
     }
 
+    /**
+     * Register a new {@link Fuel}
+     *
+     * @param fuel new Fuel to register
+     */
     public static void registerFuel(Fuel fuel) {
-        Recipe.registerFuel(fuel);
+        instance.recipeManager.registerFuel(fuel);
     }
 
+    /**
+     * Get an instance of this plugin
+     *
+     * @return Instance of this plugin
+     */
     public static FakeFurnace getPlugin() {
         return instance;
+    }
+
+    /**
+     * Get an instance of the recipe manager
+     *
+     * @return Instance of recipe manager
+     */
+    public RecipeManager getRecipeManager() {
+        return this.recipeManager;
     }
 
     private NamespacedKey getKey(String key) {

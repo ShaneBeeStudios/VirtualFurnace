@@ -10,9 +10,10 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import tk.shanebee.fakefurnace.FakeFurnace;
 import tk.shanebee.fakefurnace.recipe.Fuel;
 import tk.shanebee.fakefurnace.recipe.FurnaceRecipe;
-import tk.shanebee.fakefurnace.recipe.Recipe;
+import tk.shanebee.fakefurnace.RecipeManager;
 
 import java.util.UUID;
 
@@ -23,6 +24,7 @@ public class Furnace implements InventoryHolder {
 
     private final String name;
     private final UUID uuid;
+    private final RecipeManager recipeManager;
     private int cookTime;
     private int cookTimeTotal;
     private int fuelTime;
@@ -35,6 +37,7 @@ public class Furnace implements InventoryHolder {
     public Furnace(String name) {
         this.name = ChatColor.stripColor(name);
         this.uuid = UUID.randomUUID();
+        this.recipeManager = FakeFurnace.getPlugin().getRecipeManager();
         this.cookTime = 0;
         this.cookTimeTotal = 0;
         this.fuelTime = 0;
@@ -118,11 +121,11 @@ public class Furnace implements InventoryHolder {
     private boolean canBurn() {
         if (this.fuel == null) return false;
         //return Fuel.getByFuel(this.fuel.getType()) != null;
-        return Recipe.getByMaterial(this.fuel.getType()) != null;
+        return this.recipeManager.getByMaterial(this.fuel.getType()) != null;
     }
 
     private void processBurn() {
-        Fuel fuel = Recipe.getByMaterial(this.fuel.getType());
+        Fuel fuel = this.recipeManager.getByMaterial(this.fuel.getType());
         if (fuel == null) return;
         int fuelAmount = this.fuel.getAmount();
         if (fuelAmount > 1) {
@@ -137,14 +140,14 @@ public class Furnace implements InventoryHolder {
 
     private boolean canCook() {
         if (this.input == null) return false;
-        FurnaceRecipe result = Recipe.getByIngredient(this.input.getType());
+        FurnaceRecipe result = this.recipeManager.getByIngredient(this.input.getType());
         if (result == null) return false;
         this.cookTimeTotal = result.getCookTime();
         return this.output == null || this.output.getType() == result.getResult();
     }
 
     private void processCook() {
-        FurnaceRecipe result = Recipe.getByIngredient(this.input.getType());
+        FurnaceRecipe result = this.recipeManager.getByIngredient(this.input.getType());
         if (result == null) return;
         if (this.output == null) {
             this.output = new ItemStack(result.getResult());
