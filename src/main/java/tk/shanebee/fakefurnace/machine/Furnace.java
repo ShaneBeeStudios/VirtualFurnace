@@ -2,6 +2,7 @@ package tk.shanebee.fakefurnace.machine;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -11,13 +12,16 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import tk.shanebee.fakefurnace.FakeFurnace;
+import tk.shanebee.fakefurnace.RecipeManager;
 import tk.shanebee.fakefurnace.recipe.Fuel;
 import tk.shanebee.fakefurnace.recipe.FurnaceRecipe;
-import tk.shanebee.fakefurnace.RecipeManager;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
-public class Furnace implements InventoryHolder {
+@SuppressWarnings("unused")
+public class Furnace implements InventoryHolder, ConfigurationSerializable {
 
     // cook time = 200
     // fuel time = 1600
@@ -45,6 +49,32 @@ public class Furnace implements InventoryHolder {
         this.fuel = null;
         this.input = null;
         this.output = null;
+        this.inventory = Bukkit.createInventory(this, InventoryType.FURNACE, name);
+        this.updateInventory();
+    }
+
+    private Furnace(String name, UUID uuid, int cookTime, int fuelTime, ItemStack fuel, ItemStack input, ItemStack output) {
+        this.name = name;
+        this.uuid = uuid;
+        this.recipeManager = FakeFurnace.getPlugin().getRecipeManager();
+        this.cookTime = cookTime;
+        this.fuelTime = fuelTime;
+        this.fuel = fuel;
+        this.input = input;
+        this.output = output;
+
+        FurnaceRecipe furnaceRecipe = recipeManager.getByIngredient(input != null ? input.getType() : null);
+        if (furnaceRecipe != null) {
+            this.cookTimeTotal = furnaceRecipe.getCookTime();
+        } else {
+            this.cookTimeTotal = 0;
+        }
+        Fuel fuelF = recipeManager.getByMaterial(fuel != null ? fuel.getType() : null);
+        if (fuelF != null) {
+            this.fuelTimeTotal = fuelF.getBurnTime();
+        } else {
+            this.fuelTimeTotal = 0;
+        }
         this.inventory = Bukkit.createInventory(this, InventoryType.FURNACE, name);
         this.updateInventory();
     }
@@ -196,6 +226,30 @@ public class Furnace implements InventoryHolder {
                 ", cookTime=" + cookTime +
                 ", fuelTime=" + fuelTime +
                 '}';
+    }
+
+    @Override
+    public @NotNull Map<String, Object> serialize() {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("name", this.name);
+        result.put("uuid", this.uuid);
+        result.put("cookTime", this.cookTime);
+        result.put("fuelTime", this.fuelTime);
+        result.put("fuel", this.fuel);
+        result.put("input", this.input);
+        result.put("output", this.output);
+        return result;
+    }
+
+    public static Furnace deserialize(Map<String, Object> args) {
+        String name = ((String) args.get("name"));
+        UUID uuid = UUID.fromString(((String) args.get("uuid")));
+        int cookTime = ((Number) args.get("cookTime")).intValue();
+        int fuelTime = ((Number) args.get("fuelTime")).intValue();
+        ItemStack fuel = ((ItemStack) args.get("fuel"));
+        ItemStack input = ((ItemStack) args.get("input"));
+        ItemStack output = ((ItemStack) args.get("output"));
+        return new Furnace(name, uuid, cookTime, fuelTime, fuel, input, output);
     }
 
 }

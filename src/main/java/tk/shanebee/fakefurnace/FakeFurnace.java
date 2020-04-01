@@ -4,7 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
+import tk.shanebee.fakefurnace.machine.Furnace;
 import tk.shanebee.fakefurnace.recipe.Fuel;
 import tk.shanebee.fakefurnace.recipe.FurnaceRecipe;
 
@@ -14,13 +16,19 @@ import tk.shanebee.fakefurnace.recipe.FurnaceRecipe;
 @SuppressWarnings("unused")
 public class FakeFurnace extends JavaPlugin {
 
+    static {
+        ConfigurationSerialization.registerClass(Furnace.class, "furnace");
+    }
+
     private static FakeFurnace instance;
     private RecipeManager recipeManager;
+    private FurnaceManager furnaceManager;
 
     @Override
     public void onEnable() {
         instance = this;
         this.recipeManager = new RecipeManager(this);
+        this.furnaceManager = new FurnaceManager(this);
         log("Loading recipes...");
         registerRecipes();
         log("Recipes loaded &asuccessfully!");
@@ -84,6 +92,15 @@ public class FakeFurnace extends JavaPlugin {
      */
     public RecipeManager getRecipeManager() {
         return this.recipeManager;
+    }
+
+    /**
+     * Get an instance of the furnace manager
+     *
+     * @return Instance of furnace manager
+     */
+    public FurnaceManager getFurnaceManager() {
+        return furnaceManager;
     }
 
     private NamespacedKey getKey(String key) {
