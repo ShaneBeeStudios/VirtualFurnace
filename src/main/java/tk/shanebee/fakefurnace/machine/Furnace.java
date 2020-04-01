@@ -194,31 +194,6 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         updateInventory();
     }
 
-    public void placeItem(Player player, int slot, ItemStack item) {
-        // 0=input 1=fuel 2=output
-        switch (slot) {
-            case 0:
-                if (this.input == null) {
-                    this.input = item;
-                } else if (item.getType() == this.input.getType()) {
-                    this.input.setAmount(this.input.getAmount() + item.getAmount());
-                } else {
-                    return;
-                }
-                break;
-            case 1:
-                if (this.fuel == null) {
-                    this.fuel = item;
-                    Bukkit.broadcastMessage("Setting fuel");
-                } else if (item.getType() == this.fuel.getType()) {
-                    this.fuel.setAmount(this.fuel.getAmount() + item.getAmount());
-                    Bukkit.broadcastMessage("Increasing fuel");
-                }
-                break;
-        }
-        updateInventory();
-    }
-
     @Override
     public String toString() {
         return "FakeFurnace{" +
@@ -229,6 +204,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
                 '}';
     }
 
+    // Serializer for config
     @Override
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
