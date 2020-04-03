@@ -15,6 +15,8 @@ import tk.shanebee.fakefurnace.machine.Furnace;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -38,8 +40,13 @@ public class FurnaceManager {
         loadFurnaceConfig();
     }
 
-    public Map<UUID, Furnace> getFurnaceMap() {
-        return furnaceMap;
+    /**
+     * Get a collection of all {@link Furnace}s
+     *
+     * @return Collection of all furnaces
+     */
+    public Collection<Furnace> getAllFurnaces() {
+        return Collections.unmodifiableCollection(this.furnaceMap.values());
     }
 
     /**
