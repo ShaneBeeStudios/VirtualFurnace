@@ -5,7 +5,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import tk.shanebee.fakefurnace.FakeFurnace;
-import tk.shanebee.fakefurnace.machine.Furnace;
 import tk.shanebee.fakefurnace.util.Util;
 
 /**
@@ -32,9 +31,10 @@ public class Debug {
             public void run() {
                 long start = System.currentTimeMillis();
                 for (int i = 0; i < amount; i++) {
-                    Furnace furnace = plugin.getFurnaceManager().createFurnace("test-furnace");
-                    furnace.setFuel(new ItemStack(Material.COAL, 64));
-                    furnace.setInput(new ItemStack(Material.CHICKEN, 64));
+                    plugin.getFurnaceManager().createFurnace("test-furnace", furnace -> {
+                        furnace.setFuel(new ItemStack(Material.COAL, 64));
+                        furnace.setInput(new ItemStack(Material.CHICKEN, 64));
+                    });
                 }
                 Util.log(sender, "Created " + amount + " furnaces in " + (System.currentTimeMillis() - start) + " milliseconds.");
                 running = false;
