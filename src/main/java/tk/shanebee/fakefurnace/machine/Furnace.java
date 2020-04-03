@@ -92,6 +92,26 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         return inventory;
     }
 
+    public ItemStack getFuel() {
+        return fuel;
+    }
+
+    public void setFuel(ItemStack fuel) {
+        this.fuel = fuel;
+    }
+
+    public ItemStack getInput() {
+        return input;
+    }
+
+    public void setInput(ItemStack input) {
+        this.input = input;
+    }
+
+    public ItemStack getOutput() {
+        return output;
+    }
+
     public void openInventory(Player player) {
         updateInventory();
         player.openInventory(this.inventory);
@@ -104,11 +124,20 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     }
 
     private void updateInventoryView() {
+        ItemStack input = this.inventory.getItem(0);
+        if (this.input != input) {
+            this.input = input;
+        }
+        ItemStack fuel = this.inventory.getItem(1);
+        if (this.fuel != fuel) {
+            this.fuel = fuel;
+        }
+        ItemStack output = this.inventory.getItem(2);
+        if (this.output != output) {
+            this.output = output;
+        }
         for (HumanEntity entity : this.inventory.getViewers()) {
             InventoryView view = entity.getOpenInventory();
-            this.input = view.getItem(0);
-            this.fuel = view.getItem(1);
-            this.output = view.getItem(2);
             view.setProperty(InventoryView.Property.COOK_TIME, this.cookTime);
             view.setProperty(InventoryView.Property.TICKS_FOR_CURRENT_SMELTING, this.cookTimeTotal);
             view.setProperty(InventoryView.Property.BURN_TIME, this.fuelTime);
@@ -116,6 +145,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         }
     }
 
+    /*
     private void updateInventoryFromView() {
         for (HumanEntity entity : this.inventory.getViewers()) {
             InventoryView view = entity.getOpenInventory();
@@ -124,6 +154,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
             this.output = view.getItem(2);
         }
     }
+     */
 
     public void tick() {
         if (this.fuelTime > 0) {
