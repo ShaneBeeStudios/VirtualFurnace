@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import tk.shanebee.fakefurnace.machine.Furnace;
 
 import java.io.File;
@@ -20,11 +21,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
- * Manager for furnaces
+ * Manager for <b>{@link Furnace}</b>s
+ * <p>You can get an instance of this class from <b>{@link FakeFurnace#getFurnaceManager()}</b></p>
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class FurnaceManager {
 
     private final FakeFurnace plugin;
@@ -50,20 +53,6 @@ public class FurnaceManager {
     }
 
     /**
-     * Create a new furnace
-     * <p>This will create a new furnace, add it to the tick list, and save to file</p>
-     *
-     * @param name Name of new furnace (This shows up in the inventory view)
-     * @return Instance of this new furnace
-     */
-    public Furnace createFurnace(@NotNull String name) {
-        Furnace furnace = new Furnace(name);
-        this.furnaceMap.put(furnace.getUuid(), furnace);
-        saveFurnace(furnace, true);
-        return furnace;
-    }
-
-    /**
      * Get a {@link Furnace} by ID
      *
      * @param uuid ID of furnace to grab
@@ -74,25 +63,32 @@ public class FurnaceManager {
     }
 
     /**
-     * Create a {@link Furnace} that is attached to an {@link ItemStack}
+     * Create a new furnace
+     * <p>This will create a new furnace, add it to the tick list, and save to file</p>
      *
-     * @param name     Name of furnace (this will show up in the furnace UI)
-     * @param material Material of the new ItemStack
-     * @return New ItemStack with a furnace attached
+     * @param name Name of new furnace (This shows up in the inventory view)
+     * @return Instance of this new furnace
      */
-    public ItemStack createItemWithFurnace(@NotNull String name, @NotNull Material material) {
-        return createItemWithFurnace(name, new ItemStack(material));
+    public Furnace createFurnace(@NotNull String name) {
+        return createFurnace(name, null);
     }
 
     /**
-     * Create a {@link Furnace} that is attached to an {@link ItemStack}
+     * Create a new furnace
+     * <p>This will create a new furnace, add it to the tick list, and save to file</p>
      *
-     * @param name      Name of furnace (this will show up in the furnace UI)
-     * @param itemStack ItemStack to be copied and have a furnace attached
-     * @return New ItemStack with a furnace attached
+     * @param name Name of new furnace (This shows up in the inventory view)
+     * @param function Function to run before furnace is created
+     * @return Instance of this new furnace
      */
-    public ItemStack createItemWithFurnace(@NotNull String name, @NotNull ItemStack itemStack) {
-        return createItemWithFurnace(name, itemStack, false);
+    public Furnace createFurnace(@NotNull String name, @Nullable Consumer<Furnace> function) {
+        Furnace furnace = new Furnace(name);
+        if (function != null) {
+            function.accept(furnace);
+        }
+        this.furnaceMap.put(furnace.getUuid(), furnace);
+        saveFurnace(furnace, true);
+        return furnace;
     }
 
     /**
@@ -110,12 +106,38 @@ public class FurnaceManager {
     /**
      * Create a {@link Furnace} that is attached to an {@link ItemStack}
      *
+     * @param name     Name of furnace (this will show up in the furnace UI)
+     * @param material Material of the new ItemStack
+     * @param glowing  Whether the item should glow (enchanted)
+     * @param function Function to run before furnace is created
+     * @return New ItemStack with a furnace attached
+     */
+    public ItemStack createItemWithFurnace(@NotNull String name, @NotNull Material material, boolean glowing, @Nullable Consumer<Furnace> function) {
+        return createItemWithFurnace(name, new ItemStack(material), glowing, function);
+    }
+
+    /**
+     * Create a {@link Furnace} that is attached to an {@link ItemStack}
+     *
      * @param name      Name of furnace (this will show up in the furnace UI)
      * @param itemStack ItemStack to be copied and have a furnace attached
      * @param glowing   Whether the item should glow (enchanted)
      * @return Clone of the input ItemStack with a furnace attached
      */
     public ItemStack createItemWithFurnace(@NotNull String name, @NotNull ItemStack itemStack, boolean glowing) {
+        return createItemWithFurnace(name, itemStack, glowing, null);
+    }
+
+    /**
+     * Create a {@link Furnace} that is attached to an {@link ItemStack}
+     *
+     * @param name      Name of furnace (this will show up in the furnace UI)
+     * @param itemStack ItemStack to be copied and have a furnace attached
+     * @param glowing   Whether the item should glow (enchanted)
+     * @param function  Function to run before furnace is created
+     * @return Clone of the input ItemStack with a furnace attached
+     */
+    public ItemStack createItemWithFurnace(@NotNull String name, @NotNull ItemStack itemStack, boolean glowing, @Nullable Consumer<Furnace> function) {
         ItemStack item = itemStack.clone();
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
@@ -127,7 +149,12 @@ public class FurnaceManager {
             }
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
-        Furnace furnace = createFurnace(name);
+        Furnace furnace;
+        if (function == null) {
+            furnace = createFurnace(name);
+        } else {
+            furnace = createFurnace(name, function);
+        }
         meta.getPersistentDataContainer().set(this.key, PersistentDataType.STRING, furnace.getUuid().toString());
         item.setItemMeta(meta);
         return item;
