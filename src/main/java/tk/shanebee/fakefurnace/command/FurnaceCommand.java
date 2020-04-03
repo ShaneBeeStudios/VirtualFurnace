@@ -11,6 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import tk.shanebee.fakefurnace.FakeFurnace;
 import tk.shanebee.fakefurnace.FurnaceManager;
+import tk.shanebee.fakefurnace.debug.Debug;
 import tk.shanebee.fakefurnace.machine.Furnace;
 import tk.shanebee.fakefurnace.util.Util;
 
@@ -19,9 +20,11 @@ import java.util.UUID;
 public class FurnaceCommand implements CommandExecutor {
 
     private final FurnaceManager furnaceManager;
+    private final Debug debug;
 
     public FurnaceCommand(FakeFurnace plugin) {
         this.furnaceManager = plugin.getFurnaceManager();
+        this.debug = new Debug(plugin);
     }
 
     @Override
@@ -82,6 +85,19 @@ public class FurnaceCommand implements CommandExecutor {
                         } else {
                             player.sendMessage("This item has no ID!");
                         }
+                        break;
+                    case "debug":
+                        if (args.length == 1) {
+                            sender.sendMessage("How much ya wanna debug?");
+                            return true;
+                        }
+                        int amount = Integer.parseInt(args[1]);
+                        if (debug.isRunning()) {
+                            player.sendMessage("Debugger currently running... please wait!");
+                            return true;
+                        }
+                        sender.sendMessage("Debugging " + amount + " new furnaces!");
+                        debug.loadDebugFurnaces(amount, player);
                 }
             }
 
