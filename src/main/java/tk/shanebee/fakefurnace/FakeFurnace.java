@@ -1,7 +1,6 @@
 package tk.shanebee.fakefurnace;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -11,7 +10,8 @@ import tk.shanebee.fakefurnace.listener.FurnaceListener;
 import tk.shanebee.fakefurnace.machine.Furnace;
 import tk.shanebee.fakefurnace.recipe.Fuel;
 import tk.shanebee.fakefurnace.recipe.FurnaceRecipe;
-import tk.shanebee.fakefurnace.task.FurnaceTimer;
+import tk.shanebee.fakefurnace.task.FurnaceTick;
+import tk.shanebee.fakefurnace.util.Util;
 
 /**
  * Main class for FakeFurnace
@@ -26,23 +26,23 @@ public class FakeFurnace extends JavaPlugin {
     private static FakeFurnace instance;
     private RecipeManager recipeManager;
     private FurnaceManager furnaceManager;
-    private FurnaceTimer furnaceTimer;
+    private FurnaceTick furnaceTick;
 
     @Override
     public void onEnable() {
         instance = this;
         this.recipeManager = new RecipeManager(this);
-        log("Loading recipes...");
+        Util.log("Loading recipes...");
         registerRecipes();
-        log("Recipes loaded &asuccessfully!");
-        log("Loading fuels...");
+        Util.log("Recipes loaded &asuccessfully!");
+        Util.log("Loading fuels...");
         registerFuels();
-        log("Fuels loaded &asuccessfully!");
+        Util.log("Fuels loaded &asuccessfully!");
 
-        log("Loading furnaces...");
+        Util.log("Loading furnaces...");
         this.furnaceManager = new FurnaceManager(this);
-        log("Loaded &b" + this.furnaceManager.getFurnaceMap().size() + " &7furnaces &asuccessfully!");
-        this.furnaceTimer = new FurnaceTimer(this);
+        Util.log("Loaded &b" + this.furnaceManager.getAllFurnaces().size() + " &7furnaces &asuccessfully!");
+        this.furnaceTick = new FurnaceTick(this);
 
         registerCommands();
         registerListeners();
@@ -51,11 +51,11 @@ public class FakeFurnace extends JavaPlugin {
     @Override
     public void onDisable() {
         instance = null;
-        log("Saving &b" + this.furnaceManager.getFurnaceMap().size() + " &7furnaces...");
+        Util.log("Saving &b" + this.furnaceManager.getAllFurnaces().size() + " &7furnaces...");
         this.furnaceManager.saveAll();
-        log("Furnaces saved &asuccessfully!");
-        this.furnaceTimer.cancel();
-        this.furnaceTimer = null;
+        Util.log("Furnaces saved &asuccessfully!");
+        this.furnaceTick.cancel();
+        this.furnaceTick = null;
     }
 
     private void registerListeners() {
@@ -139,11 +139,6 @@ public class FakeFurnace extends JavaPlugin {
 
     private NamespacedKey getKey(String key) {
         return new NamespacedKey(this, key);
-    }
-
-    private void log(String message) {
-        String prefix = "&7[&bFake&3Furnace&7] ";
-        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + message));
     }
 
 }
