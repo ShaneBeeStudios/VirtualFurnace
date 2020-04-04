@@ -1,5 +1,6 @@
-package com.shanebeestudios.vf;
+package com.shanebeestudios.vf.api;
 
+import com.shanebeestudios.vf.api.machine.Furnace;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
@@ -12,7 +13,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.shanebeestudios.vf.machine.Furnace;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,22 +24,22 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * Manager for <b>{@link Furnace}</b>s
- * <p>You can get an instance of this class from <b>{@link VirtualFurnace#getFurnaceManager()}</b></p>
+ * Manager for furnaces
+ * <p>You can get an instance of this class from <b>{@link VirtualFurnaceAPI#getFurnaceManager()}</b></p>
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class FurnaceManager {
 
-    private final VirtualFurnace plugin;
+    private final VirtualFurnaceAPI virtualFurnaceAPI;
     private File furnaceFile;
     private FileConfiguration furnaceConfig;
     private final Map<UUID, Furnace> furnaceMap;
     private final NamespacedKey key;
 
-    FurnaceManager(VirtualFurnace plugin) {
-        this.plugin = plugin;
+    FurnaceManager(VirtualFurnaceAPI virtualFurnaceAPI) {
+        this.virtualFurnaceAPI = virtualFurnaceAPI;
         this.furnaceMap = new HashMap<>();
-        this.key = new NamespacedKey(plugin, "furnaceID");
+        this.key = new NamespacedKey(virtualFurnaceAPI.getJavaPlugin(), "furnaceID");
         loadFurnaceConfig();
     }
 
@@ -179,10 +179,10 @@ public class FurnaceManager {
 
     private void loadFurnaceConfig() {
         if (this.furnaceFile == null) {
-            this.furnaceFile = new File(this.plugin.getDataFolder(), "furnaces.yml");
+            this.furnaceFile = new File(this.virtualFurnaceAPI.getJavaPlugin().getDataFolder(), "furnaces.yml");
         }
         if (!furnaceFile.exists()) {
-            this.plugin.saveResource("furnaces.yml", false);
+            this.virtualFurnaceAPI.getJavaPlugin().saveResource("furnaces.yml", false);
         }
         this.furnaceConfig = YamlConfiguration.loadConfiguration(this.furnaceFile);
         loadFurnaces();

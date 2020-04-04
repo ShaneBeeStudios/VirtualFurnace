@@ -1,4 +1,4 @@
-package com.shanebeestudios.vf.recipe;
+package com.shanebeestudios.vf.api.recipe;
 
 import org.bukkit.Keyed;
 import org.bukkit.Material;

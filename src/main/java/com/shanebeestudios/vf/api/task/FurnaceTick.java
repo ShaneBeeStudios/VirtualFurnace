@@ -1,9 +1,9 @@
-package com.shanebeestudios.vf.task;
+package com.shanebeestudios.vf.api.task;
 
+import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import org.bukkit.scheduler.BukkitRunnable;
-import com.shanebeestudios.vf.VirtualFurnace;
-import com.shanebeestudios.vf.FurnaceManager;
-import com.shanebeestudios.vf.machine.Furnace;
+import com.shanebeestudios.vf.api.FurnaceManager;
+import com.shanebeestudios.vf.api.machine.Furnace;
 
 /**
  * Timer for ticking furnaces
@@ -13,10 +13,10 @@ public class FurnaceTick extends BukkitRunnable {
     private final FurnaceManager furnaceManager;
     private int tick;
 
-    public FurnaceTick(VirtualFurnace plugin) {
-        this.furnaceManager = plugin.getFurnaceManager();
+    public FurnaceTick(VirtualFurnaceAPI virtualFurnaceAPI) {
+        this.furnaceManager = virtualFurnaceAPI.getFurnaceManager();
         this.tick = 0;
-        this.runTaskTimerAsynchronously(plugin, 1, 1);
+        this.runTaskTimerAsynchronously(virtualFurnaceAPI.getJavaPlugin(), 1, 1);
     }
 
     @Override

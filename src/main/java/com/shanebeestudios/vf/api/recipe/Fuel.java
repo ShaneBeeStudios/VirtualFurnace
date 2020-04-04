@@ -1,6 +1,6 @@
-package com.shanebeestudios.vf.recipe;
+package com.shanebeestudios.vf.api.recipe;
 
-import com.shanebeestudios.vf.util.Util;
+import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;

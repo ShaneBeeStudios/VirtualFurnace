@@ -1,10 +1,10 @@
-package com.shanebeestudios.vf.machine;
+package com.shanebeestudios.vf.api.machine;
 
-import com.shanebeestudios.vf.RecipeManager;
-import com.shanebeestudios.vf.VirtualFurnace;
-import com.shanebeestudios.vf.recipe.Fuel;
-import com.shanebeestudios.vf.recipe.FurnaceRecipe;
-import com.shanebeestudios.vf.util.Util;
+import com.shanebeestudios.vf.api.RecipeManager;
+import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
+import com.shanebeestudios.vf.api.recipe.Fuel;
+import com.shanebeestudios.vf.api.recipe.FurnaceRecipe;
+import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -21,11 +21,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Virtual furnace object
+ */
 @SuppressWarnings("unused")
 public class Furnace implements InventoryHolder, ConfigurationSerializable {
-
-    // cook time = 200
-    // fuel time = 1600
 
     private final String name;
     private final UUID uuid;
@@ -39,10 +39,15 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     private ItemStack output;
     private final Inventory inventory;
 
+    /** Create a new furnace object
+     * <p><b>NOTE:</b> Creating a furnace object using this method will not tick the furnace.</p>
+     * <p>It is recommended to use <b>{@link com.shanebeestudios.vf.api.FurnaceManager#createFurnace(String)}</b></p>
+     * @param name Name of the object which will show up in the UI
+     */
     public Furnace(String name) {
         this.name = name;
         this.uuid = UUID.randomUUID();
-        this.recipeManager = VirtualFurnace.getPlugin().getRecipeManager();
+        this.recipeManager = VirtualFurnaceAPI.getInstance().getRecipeManager();
         this.cookTime = 0;
         this.cookTimeTotal = 0;
         this.fuelTime = 0;
@@ -57,7 +62,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     private Furnace(String name, UUID uuid, int cookTime, int fuelTime, ItemStack fuel, ItemStack input, ItemStack output) {
         this.name = name;
         this.uuid = uuid;
-        this.recipeManager = VirtualFurnace.getPlugin().getRecipeManager();
+        this.recipeManager = VirtualFurnaceAPI.getInstance().getRecipeManager();
         this.cookTime = cookTime;
         this.fuelTime = fuelTime;
         this.fuel = fuel;
@@ -234,6 +239,12 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
                 '}';
     }
 
+    /**
+     * Serialize this object for yaml
+     * <p><b>Internal use only!</b></p>
+     *
+     * @return Returns serialized map of object
+     */
     // Serializer for config
     @Override
     public @NotNull Map<String, Object> serialize() {
@@ -248,6 +259,13 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         return result;
     }
 
+    /**
+     * Deserialize this object from yaml
+     * <p><b>Internal use only!</b></p>
+     *
+     * @param args Serialized map of object
+     * @return New instance of object
+     */
     public static Furnace deserialize(Map<String, Object> args) {
         String name = ((String) args.get("name"));
         UUID uuid = UUID.fromString(((String) args.get("uuid")));

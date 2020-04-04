@@ -1,9 +1,9 @@
 package com.shanebeestudios.vf.command;
 
-import com.shanebeestudios.vf.FurnaceManager;
+import com.shanebeestudios.vf.api.FurnaceManager;
 import com.shanebeestudios.vf.VirtualFurnace;
 import com.shanebeestudios.vf.debug.Debug;
-import com.shanebeestudios.vf.util.Util;
+import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
-import com.shanebeestudios.vf.machine.Furnace;
+import com.shanebeestudios.vf.api.machine.Furnace;
 
 import java.util.UUID;
 

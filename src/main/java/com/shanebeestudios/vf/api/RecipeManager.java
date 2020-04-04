@@ -1,7 +1,7 @@
-package com.shanebeestudios.vf;
+package com.shanebeestudios.vf.api;
 
-import com.shanebeestudios.vf.recipe.Fuel;
-import com.shanebeestudios.vf.recipe.FurnaceRecipe;
+import com.shanebeestudios.vf.api.recipe.Fuel;
+import com.shanebeestudios.vf.api.recipe.FurnaceRecipe;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
@@ -10,6 +10,7 @@ import java.util.Map;
 
 /**
  * Recipe manager for furnaces
+ * <p>You can get an instance of this class from <b>{@link VirtualFurnaceAPI#getRecipeManager()}</b></p>
  */
 @SuppressWarnings({"UnusedReturnValue", "unused"})
 public class RecipeManager {
@@ -17,7 +18,7 @@ public class RecipeManager {
     private final Map<NamespacedKey, Fuel> fuelMap;
     private final Map<NamespacedKey, FurnaceRecipe> furnaceRecipeMap;
 
-    RecipeManager(VirtualFurnace plugin) {
+    RecipeManager() {
         this.fuelMap = new HashMap<>();
         this.furnaceRecipeMap = new HashMap<>();
     }

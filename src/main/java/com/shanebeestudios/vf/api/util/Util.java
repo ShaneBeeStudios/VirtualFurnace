@@ -1,6 +1,6 @@
-package com.shanebeestudios.vf.util;
+package com.shanebeestudios.vf.api.util;
 
-import com.shanebeestudios.vf.VirtualFurnace;
+import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
@@ -9,13 +9,14 @@ import org.bukkit.command.CommandSender;
 public class Util {
 
     private static final String PREFIX = "&7[&bFake&3Furnace&7] ";
+    private static final String[] VERSION = Bukkit.getServer().getBukkitVersion().split("-")[0].split("\\.");
 
     public static String getColString(String string) {
         return ChatColor.translateAlternateColorCodes('&', string);
     }
 
     public static NamespacedKey getKey(String key) {
-        return new NamespacedKey(VirtualFurnace.getPlugin(), key);
+        return new NamespacedKey(VirtualFurnaceAPI.getInstance().getJavaPlugin(), key);
     }
 
     /**
@@ -38,12 +39,11 @@ public class Util {
      * @return True if running this version or higher
      */
     public static boolean isRunningMinecraft(int major, int minor, int revision) {
-        String[] version = Bukkit.getServer().getBukkitVersion().split("-")[0].split("\\.");
-        int maj = Integer.parseInt(version[0]);
-        int min = Integer.parseInt(version[1]);
+        int maj = Integer.parseInt(VERSION[0]);
+        int min = Integer.parseInt(VERSION[1]);
         int rev;
         try {
-            rev = Integer.parseInt(version[2]);
+            rev = Integer.parseInt(VERSION[2]);
         } catch (Exception ignore) {
             rev = 0;
         }

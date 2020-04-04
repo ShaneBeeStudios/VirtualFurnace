@@ -1,7 +1,7 @@
 package com.shanebeestudios.vf.debug;
 
 import com.shanebeestudios.vf.VirtualFurnace;
-import com.shanebeestudios.vf.util.Util;
+import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;

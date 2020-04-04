@@ -1,51 +1,38 @@
 package com.shanebeestudios.vf;
 
-import com.shanebeestudios.vf.listener.FurnaceListener;
-import com.shanebeestudios.vf.task.FurnaceTick;
-import org.bukkit.Bukkit;
+import com.shanebeestudios.vf.api.FurnaceManager;
+import com.shanebeestudios.vf.api.RecipeManager;
+import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
+import com.shanebeestudios.vf.api.recipe.Fuel;
+import com.shanebeestudios.vf.api.recipe.FurnaceRecipe;
+import com.shanebeestudios.vf.api.task.FurnaceTick;
+import com.shanebeestudios.vf.api.util.Util;
+import com.shanebeestudios.vf.command.FurnaceCommand;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
-import com.shanebeestudios.vf.command.FurnaceCommand;
-import com.shanebeestudios.vf.machine.Furnace;
-import com.shanebeestudios.vf.recipe.Fuel;
-import com.shanebeestudios.vf.recipe.FurnaceRecipe;
-import com.shanebeestudios.vf.util.Util;
 
 /**
- * Main class for FakeFurnace
+ * Main class for VirtualFurnace plugin
  */
 @SuppressWarnings("unused")
 public class VirtualFurnace extends JavaPlugin {
-
-    static {
-        ConfigurationSerialization.registerClass(Furnace.class, "furnace");
-    }
 
     private static VirtualFurnace instance;
     private RecipeManager recipeManager;
     private FurnaceManager furnaceManager;
     private FurnaceTick furnaceTick;
 
+    // If run as a Bukkit plugin, load the plugin
     @Override
     public void onEnable() {
         instance = this;
-        this.recipeManager = new RecipeManager(this);
-        Util.log("Loading recipes...");
-        registerRecipes();
-        Util.log("Recipes loaded &asuccessfully!");
-        Util.log("Loading fuels...");
-        registerFuels();
-        Util.log("Fuels loaded &asuccessfully!");
-
-        Util.log("Loading furnaces...");
-        this.furnaceManager = new FurnaceManager(this);
-        Util.log("Loaded &b" + this.furnaceManager.getAllFurnaces().size() + " &7furnaces &asuccessfully!");
-        this.furnaceTick = new FurnaceTick(this);
+        VirtualFurnaceAPI virtualFurnaceAPI = new VirtualFurnaceAPI(this);
+        this.recipeManager = virtualFurnaceAPI.getRecipeManager();
+        this.furnaceManager = virtualFurnaceAPI.getFurnaceManager();
+        this.furnaceTick = virtualFurnaceAPI.getFurnaceTick();
 
         registerCommands();
-        registerListeners();
     }
 
     @Override
@@ -57,11 +44,6 @@ public class VirtualFurnace extends JavaPlugin {
         this.furnaceTick.cancel();
         this.furnaceTick = null;
     }
-
-    private void registerListeners() {
-        Bukkit.getPluginManager().registerEvents(new FurnaceListener(this), this);
-    }
-
     @SuppressWarnings("ConstantConditions")
     private void registerCommands() {
         getCommand("furnace").setExecutor(new FurnaceCommand(this));
