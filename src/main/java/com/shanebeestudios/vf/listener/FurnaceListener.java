@@ -1,19 +1,19 @@
-package tk.shanebee.fakefurnace.listener;
+package com.shanebeestudios.vf.listener;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import tk.shanebee.fakefurnace.FakeFurnace;
-import tk.shanebee.fakefurnace.FurnaceManager;
-import tk.shanebee.fakefurnace.machine.Furnace;
+import com.shanebeestudios.vf.VirtualFurnace;
+import com.shanebeestudios.vf.FurnaceManager;
+import com.shanebeestudios.vf.machine.Furnace;
 
 public class FurnaceListener implements Listener {
 
     private final FurnaceManager furnaceManager;
 
-    public FurnaceListener(FakeFurnace plugin) {
+    public FurnaceListener(VirtualFurnace plugin) {
         this.furnaceManager = plugin.getFurnaceManager();
     }
 

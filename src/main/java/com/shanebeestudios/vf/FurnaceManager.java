@@ -1,4 +1,4 @@
-package tk.shanebee.fakefurnace;
+package com.shanebeestudios.vf;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -12,7 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import tk.shanebee.fakefurnace.machine.Furnace;
+import com.shanebeestudios.vf.machine.Furnace;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,18 +25,18 @@ import java.util.function.Consumer;
 
 /**
  * Manager for <b>{@link Furnace}</b>s
- * <p>You can get an instance of this class from <b>{@link FakeFurnace#getFurnaceManager()}</b></p>
+ * <p>You can get an instance of this class from <b>{@link VirtualFurnace#getFurnaceManager()}</b></p>
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class FurnaceManager {
 
-    private final FakeFurnace plugin;
+    private final VirtualFurnace plugin;
     private File furnaceFile;
     private FileConfiguration furnaceConfig;
     private final Map<UUID, Furnace> furnaceMap;
     private final NamespacedKey key;
 
-    FurnaceManager(FakeFurnace plugin) {
+    FurnaceManager(VirtualFurnace plugin) {
         this.plugin = plugin;
         this.furnaceMap = new HashMap<>();
         this.key = new NamespacedKey(plugin, "furnaceID");

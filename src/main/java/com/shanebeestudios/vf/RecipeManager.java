@@ -1,10 +1,9 @@
-package tk.shanebee.fakefurnace;
+package com.shanebeestudios.vf;
 
+import com.shanebeestudios.vf.recipe.Fuel;
+import com.shanebeestudios.vf.recipe.FurnaceRecipe;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Tag;
-import tk.shanebee.fakefurnace.recipe.Fuel;
-import tk.shanebee.fakefurnace.recipe.FurnaceRecipe;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +17,7 @@ public class RecipeManager {
     private final Map<NamespacedKey, Fuel> fuelMap;
     private final Map<NamespacedKey, FurnaceRecipe> furnaceRecipeMap;
 
-    RecipeManager(FakeFurnace plugin) {
+    RecipeManager(VirtualFurnace plugin) {
         this.fuelMap = new HashMap<>();
         this.furnaceRecipeMap = new HashMap<>();
     }

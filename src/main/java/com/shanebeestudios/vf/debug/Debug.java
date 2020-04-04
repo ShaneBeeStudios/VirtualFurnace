@@ -1,21 +1,21 @@
-package tk.shanebee.fakefurnace.debug;
+package com.shanebeestudios.vf.debug;
 
+import com.shanebeestudios.vf.VirtualFurnace;
+import com.shanebeestudios.vf.util.Util;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import tk.shanebee.fakefurnace.FakeFurnace;
-import tk.shanebee.fakefurnace.util.Util;
 
 /**
  * Debug class for stress testing furnaces
  */
 public class Debug {
 
-    private final FakeFurnace plugin;
+    private final VirtualFurnace plugin;
     private boolean running;
 
-    public Debug(FakeFurnace plugin) {
+    public Debug(VirtualFurnace plugin) {
         this.plugin = plugin;
         this.running = false;
     }

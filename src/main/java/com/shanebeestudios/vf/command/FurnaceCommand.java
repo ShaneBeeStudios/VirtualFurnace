@@ -1,5 +1,9 @@
-package tk.shanebee.fakefurnace.command;
+package com.shanebeestudios.vf.command;
 
+import com.shanebeestudios.vf.FurnaceManager;
+import com.shanebeestudios.vf.VirtualFurnace;
+import com.shanebeestudios.vf.debug.Debug;
+import com.shanebeestudios.vf.util.Util;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -9,11 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
-import tk.shanebee.fakefurnace.FakeFurnace;
-import tk.shanebee.fakefurnace.FurnaceManager;
-import tk.shanebee.fakefurnace.debug.Debug;
-import tk.shanebee.fakefurnace.machine.Furnace;
-import tk.shanebee.fakefurnace.util.Util;
+import com.shanebeestudios.vf.machine.Furnace;
 
 import java.util.UUID;
 
@@ -22,7 +22,7 @@ public class FurnaceCommand implements CommandExecutor {
     private final FurnaceManager furnaceManager;
     private final Debug debug;
 
-    public FurnaceCommand(FakeFurnace plugin) {
+    public FurnaceCommand(VirtualFurnace plugin) {
         this.furnaceManager = plugin.getFurnaceManager();
         this.debug = new Debug(plugin);
     }

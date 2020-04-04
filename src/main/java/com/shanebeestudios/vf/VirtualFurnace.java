@@ -1,29 +1,29 @@
-package tk.shanebee.fakefurnace;
+package com.shanebeestudios.vf;
 
+import com.shanebeestudios.vf.listener.FurnaceListener;
+import com.shanebeestudios.vf.task.FurnaceTick;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
-import tk.shanebee.fakefurnace.command.FurnaceCommand;
-import tk.shanebee.fakefurnace.listener.FurnaceListener;
-import tk.shanebee.fakefurnace.machine.Furnace;
-import tk.shanebee.fakefurnace.recipe.Fuel;
-import tk.shanebee.fakefurnace.recipe.FurnaceRecipe;
-import tk.shanebee.fakefurnace.task.FurnaceTick;
-import tk.shanebee.fakefurnace.util.Util;
+import com.shanebeestudios.vf.command.FurnaceCommand;
+import com.shanebeestudios.vf.machine.Furnace;
+import com.shanebeestudios.vf.recipe.Fuel;
+import com.shanebeestudios.vf.recipe.FurnaceRecipe;
+import com.shanebeestudios.vf.util.Util;
 
 /**
  * Main class for FakeFurnace
  */
 @SuppressWarnings("unused")
-public class FakeFurnace extends JavaPlugin {
+public class VirtualFurnace extends JavaPlugin {
 
     static {
         ConfigurationSerialization.registerClass(Furnace.class, "furnace");
     }
 
-    private static FakeFurnace instance;
+    private static VirtualFurnace instance;
     private RecipeManager recipeManager;
     private FurnaceManager furnaceManager;
     private FurnaceTick furnaceTick;
@@ -115,7 +115,7 @@ public class FakeFurnace extends JavaPlugin {
      *
      * @return Instance of this plugin
      */
-    public static FakeFurnace getPlugin() {
+    public static VirtualFurnace getPlugin() {
         return instance;
     }
 

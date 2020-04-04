@@ -1,10 +1,10 @@
-package tk.shanebee.fakefurnace.util;
+package com.shanebeestudios.vf.util;
 
+import com.shanebeestudios.vf.VirtualFurnace;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
-import tk.shanebee.fakefurnace.FakeFurnace;
 
 public class Util {
 
@@ -15,7 +15,7 @@ public class Util {
     }
 
     public static NamespacedKey getKey(String key) {
-        return new NamespacedKey(FakeFurnace.getPlugin(), key);
+        return new NamespacedKey(VirtualFurnace.getPlugin(), key);
     }
 
     /**

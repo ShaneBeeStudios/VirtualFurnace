@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>tk.shanebee</groupId>
-    <artifactId>FakeFurnace</artifactId>
+    <artifactId>VirtualFurnace</artifactId>
     <version>1.0.0</version>
 
     <properties>

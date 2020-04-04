@@ -1,4 +1,4 @@
-package tk.shanebee.fakefurnace.recipe;
+package com.shanebeestudios.vf.recipe;
 
 import org.bukkit.Keyed;
 import org.bukkit.Material;

@@ -1,11 +1,11 @@
-package tk.shanebee.fakefurnace.recipe;
+package com.shanebeestudios.vf.recipe;
 
+import com.shanebeestudios.vf.util.Util;
 import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.jetbrains.annotations.NotNull;
-import tk.shanebee.fakefurnace.util.Util;
 
 import java.util.ArrayList;
 import java.util.Collections;

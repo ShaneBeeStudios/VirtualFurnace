@@ -1,5 +1,10 @@
-package tk.shanebee.fakefurnace.machine;
+package com.shanebeestudios.vf.machine;
 
+import com.shanebeestudios.vf.RecipeManager;
+import com.shanebeestudios.vf.VirtualFurnace;
+import com.shanebeestudios.vf.recipe.Fuel;
+import com.shanebeestudios.vf.recipe.FurnaceRecipe;
+import com.shanebeestudios.vf.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -11,11 +16,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import tk.shanebee.fakefurnace.FakeFurnace;
-import tk.shanebee.fakefurnace.RecipeManager;
-import tk.shanebee.fakefurnace.recipe.Fuel;
-import tk.shanebee.fakefurnace.recipe.FurnaceRecipe;
-import tk.shanebee.fakefurnace.util.Util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -42,7 +42,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     public Furnace(String name) {
         this.name = name;
         this.uuid = UUID.randomUUID();
-        this.recipeManager = FakeFurnace.getPlugin().getRecipeManager();
+        this.recipeManager = VirtualFurnace.getPlugin().getRecipeManager();
         this.cookTime = 0;
         this.cookTimeTotal = 0;
         this.fuelTime = 0;
@@ -57,7 +57,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     private Furnace(String name, UUID uuid, int cookTime, int fuelTime, ItemStack fuel, ItemStack input, ItemStack output) {
         this.name = name;
         this.uuid = uuid;
-        this.recipeManager = FakeFurnace.getPlugin().getRecipeManager();
+        this.recipeManager = VirtualFurnace.getPlugin().getRecipeManager();
         this.cookTime = cookTime;
         this.fuelTime = fuelTime;
         this.fuel = fuel;
