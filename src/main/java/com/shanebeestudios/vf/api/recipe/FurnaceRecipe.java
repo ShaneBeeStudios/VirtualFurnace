@@ -26,27 +26,18 @@ public class FurnaceRecipe implements Keyed {
     static {
         Bukkit.recipeIterator().forEachRemaining(recipe -> {
             if (recipe instanceof org.bukkit.inventory.FurnaceRecipe) {
-                NamespacedKey key = Util.getKey("mc_furnace_" + ((org.bukkit.inventory.FurnaceRecipe) recipe).getKey().getKey());
-                Material ingredient = ((org.bukkit.inventory.FurnaceRecipe) recipe).getInput().getType();
-                Material result = recipe.getResult().getType();
-                int cookTime = ((org.bukkit.inventory.FurnaceRecipe) recipe).getCookingTime();
-                FurnaceRecipe furnaceRecipe = new FurnaceRecipe(key, ingredient, result, cookTime);
-                VANILLA_FURNACE_RECIPES.add(furnaceRecipe);
+                org.bukkit.inventory.FurnaceRecipe r = ((org.bukkit.inventory.FurnaceRecipe) recipe);
+                FurnaceRecipe rec = new FurnaceRecipe(Util.getKey("mc_furnace_"), r.getInput().getType(), r.getResult().getType(), r.getCookingTime());
+                VANILLA_FURNACE_RECIPES.add(rec);
             } else if (HAS_SMOKING) {
                 if (recipe instanceof SmokingRecipe) {
-                    NamespacedKey key = Util.getKey("mc_smoking_" + ((SmokingRecipe) recipe).getKey().getKey());
-                    Material ingredient = ((SmokingRecipe) recipe).getInput().getType();
-                    Material result = recipe.getResult().getType();
-                    int cookTime = ((SmokingRecipe) recipe).getCookingTime();
-                    FurnaceRecipe furnaceRecipe = new FurnaceRecipe(key, ingredient, result, cookTime);
-                    VANILLA_SMOKING_RECIPES.add(furnaceRecipe);
+                    SmokingRecipe r = ((SmokingRecipe) recipe);
+                    FurnaceRecipe rec = new FurnaceRecipe(Util.getKey("mc_smoking_" + r.getKey().getKey()), r.getInput().getType(), r.getResult().getType(), r.getCookingTime());
+                    VANILLA_SMOKING_RECIPES.add(rec);
                 } else if (recipe instanceof BlastingRecipe) {
-                    NamespacedKey key = Util.getKey("mc_blasting_" + ((BlastingRecipe) recipe).getKey().getKey());
-                    Material ingredient = ((BlastingRecipe) recipe).getInput().getType();
-                    Material result = recipe.getResult().getType();
-                    int cookTime = ((BlastingRecipe) recipe).getCookingTime();
-                    FurnaceRecipe furnaceRecipe = new FurnaceRecipe(key, ingredient, result, cookTime);
-                    VANILLA_BLASTING_RECIPES.add(furnaceRecipe);
+                    BlastingRecipe r = ((BlastingRecipe) recipe);
+                    FurnaceRecipe rec = new FurnaceRecipe(Util.getKey("mc_blasting_" + r.getKey().getKey()), r.getInput().getType(), r.getResult().getType(), r.getCookingTime());
+                    VANILLA_BLASTING_RECIPES.add(rec);
                 }
             }
         });
