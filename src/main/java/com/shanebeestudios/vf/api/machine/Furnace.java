@@ -6,7 +6,6 @@ import com.shanebeestudios.vf.api.recipe.Fuel;
 import com.shanebeestudios.vf.api.recipe.FurnaceRecipe;
 import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -30,13 +29,13 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     private final String name;
     private final UUID uuid;
     private final RecipeManager recipeManager;
+    private ItemStack fuel;
+    private ItemStack input;
+    private ItemStack output;
     private int cookTime;
     private int cookTimeTotal;
     private int fuelTime;
     private int fuelTimeTotal;
-    private ItemStack fuel;
-    private ItemStack input;
-    private ItemStack output;
     private final Inventory inventory;
 
     /** Create a new furnace object
@@ -231,9 +230,12 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
 
     @Override
     public String toString() {
-        return "FakeFurnace{" +
-                "name='" + ChatColor.stripColor(name) + '\'' +
+        return "Furnace{" +
+                "name='" + name + '\'' +
                 ", uuid=" + uuid +
+                ", fuel=" + fuel +
+                ", input=" + input +
+                ", output=" + output +
                 ", cookTime=" + cookTime +
                 ", fuelTime=" + fuelTime +
                 '}';
