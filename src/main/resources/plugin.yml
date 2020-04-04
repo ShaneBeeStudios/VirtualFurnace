@@ -7,3 +7,4 @@ author: ShaneBee
 commands:
   furnace:
     description: create a new furnace
+    permission: virtualfurnace.command.furnace
