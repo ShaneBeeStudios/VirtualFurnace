@@ -8,13 +8,26 @@ import org.bukkit.command.CommandSender;
 
 public class Util {
 
-    private static final String PREFIX = "&7[&bFake&3Furnace&7] ";
+    private static final String PREFIX = "&7[&bVirtual&3Furnace&7] ";
     private static final String[] VERSION = Bukkit.getServer().getBukkitVersion().split("-")[0].split("\\.");
 
+    /**
+     * Get a string using '&' color code
+     * <p>Mainly used internally</p>
+     *
+     * @param string String with color codes
+     * @return New String including colors
+     */
     public static String getColString(String string) {
         return ChatColor.translateAlternateColorCodes('&', string);
     }
 
+    /**
+     * Get a NamespacedKey associated with the plugin running this API
+     *
+     * @param key Key to create
+     * @return New NamespacedKey
+     */
     public static NamespacedKey getKey(String key) {
         return new NamespacedKey(VirtualFurnaceAPI.getInstance().getJavaPlugin(), key);
     }
@@ -52,7 +65,7 @@ public class Util {
 
     /**
      * Log a message to console
-     * <p>This message will be prefixed with the plugin's name</p>
+     * <p>This message will be prefixed with VirtualFurnace</p>
      *
      * @param message Message to log
      */
@@ -62,9 +75,9 @@ public class Util {
 
     /**
      * Log a message to a player/console
-     * <p>This message will be prefixed with the plugin's name</p>
+     * <p>This message will be prefixed with VirtualFurnace</p>
      *
-     * @param sender  player/console to reclieve message
+     * @param sender  player/console to receive message
      * @param message Message to log
      */
     public static void log(CommandSender sender, String message) {
