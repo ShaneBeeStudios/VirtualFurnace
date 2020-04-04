@@ -84,38 +84,65 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         this.updateInventory();
     }
 
+    /** Get this furnace's name
+     * @return Name of this furnace
+     */
     public String getName() {
         return name;
     }
 
+    /** Get this furnace's UUID
+     * @return UUID of this furnace
+     */
     public UUID getUuid() {
         return uuid;
     }
 
+    /** Get this furnace's inventory
+     * @return Inventory
+     */
     public @NotNull Inventory getInventory() {
         return inventory;
     }
 
+    /** Get this furnace's current fuel
+     * @return Current fuel
+     */
     public ItemStack getFuel() {
         return fuel;
     }
 
+    /** Set this furnace's fuel
+     * @param fuel Fuel to set
+     */
     public void setFuel(ItemStack fuel) {
         this.fuel = fuel;
     }
 
+    /** Get this furnace's current input ItemStack
+     * @return Current input
+     */
     public ItemStack getInput() {
         return input;
     }
 
+    /** Set this furnace's input ItemStack
+     * @param input ItemStack to set
+     */
     public void setInput(ItemStack input) {
         this.input = input;
     }
 
+    /** Get this furnace's output ItemStack
+     * @return Output itemstack
+     */
     public ItemStack getOutput() {
         return output;
     }
 
+    /** Open this furnace's inventory to a player
+     * @param player Player to open inventory to
+     */
     public void openInventory(Player player) {
         updateInventory();
         player.openInventory(this.inventory);
@@ -160,6 +187,11 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     }
      */
 
+    /**
+     * Tick this furnace
+     * <p>This will process the fuel, cook the input item
+     * and update the inventory</p>
+     */
     public void tick() {
         if (this.fuelTime > 0) {
             this.fuelTime--;
