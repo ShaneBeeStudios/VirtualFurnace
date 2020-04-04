@@ -17,11 +17,6 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class Fuel implements Keyed {
 
-    private final NamespacedKey key;
-    private final Material fuel;
-    private final Tag<Material> tag;
-    private final int burnTime;
-
     private static final List<Fuel> VANILLA_FUELS = new ArrayList<>();
 
     public static final Fuel LAVA_BUCKET = get("lava_bucket", Material.LAVA_BUCKET, 20000);
@@ -117,6 +112,11 @@ public class Fuel implements Keyed {
         return fuel;
     }
 
+    private final NamespacedKey key;
+    private final Material material;
+    private final Tag<Material> tag;
+    private final int burnTime;
+
     /**
      * Get an immutable list of vanilla MC fuels
      *
@@ -129,13 +129,13 @@ public class Fuel implements Keyed {
     /**
      * Create a new fuel for furnaces
      *
-     * @param key      Key for recipe
-     * @param fuel     Fuel to register
-     * @param burnTime Time this fuel will burn for (in ticks)
+     * @param key          Key for recipe
+     * @param fuelMaterial Fuel to register
+     * @param burnTime     Time this fuel will burn for (in ticks)
      */
-    public Fuel(NamespacedKey key, Material fuel, int burnTime) {
+    public Fuel(NamespacedKey key, Material fuelMaterial, int burnTime) {
         this.key = key;
-        this.fuel = fuel;
+        this.material = fuelMaterial;
         this.tag = null;
         this.burnTime = burnTime;
     }
@@ -149,7 +149,7 @@ public class Fuel implements Keyed {
      */
     public Fuel(NamespacedKey key, Tag<Material> fuelTag, int burnTime) {
         this.key = key;
-        this.fuel = null;
+        this.material = null;
         this.tag = fuelTag;
         this.burnTime = burnTime;
     }
@@ -170,7 +170,7 @@ public class Fuel implements Keyed {
      * @return Material of fuel (null if non-existent)
      */
     public Material getFuel() {
-        return this.fuel;
+        return this.material;
     }
 
     /**
@@ -189,7 +189,7 @@ public class Fuel implements Keyed {
      * @return True if material matches
      */
     public boolean matchFuel(Material material) {
-        if (fuel != null && fuel == material) {
+        if (this.material != null && this.material == material) {
             return true;
         } else return tag != null && tag.isTagged(material);
     }
@@ -201,6 +201,16 @@ public class Fuel implements Keyed {
      */
     public int getBurnTime() {
         return this.burnTime;
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public String toString() {
+        return "Fuel{" +
+                "key=" + key +
+                (material != null ? ", material=" + material : ", tag=" + tag.getKey()) +
+                ", burnTime=" + burnTime +
+                '}';
     }
 
 }
