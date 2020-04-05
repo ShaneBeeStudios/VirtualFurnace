@@ -27,7 +27,7 @@ public class FurnaceRecipe implements Keyed {
         Bukkit.recipeIterator().forEachRemaining(recipe -> {
             if (recipe instanceof org.bukkit.inventory.FurnaceRecipe) {
                 org.bukkit.inventory.FurnaceRecipe r = ((org.bukkit.inventory.FurnaceRecipe) recipe);
-                FurnaceRecipe rec = new FurnaceRecipe(Util.getKey("mc_furnace_"), r.getInput().getType(), r.getResult().getType(), r.getCookingTime());
+                FurnaceRecipe rec = new FurnaceRecipe(Util.getKey("mc_furnace_" + r.getKey().getKey()), r.getInput().getType(), r.getResult().getType(), r.getCookingTime());
                 VANILLA_FURNACE_RECIPES.add(rec);
             } else if (HAS_SMOKING) {
                 if (recipe instanceof SmokingRecipe) {
