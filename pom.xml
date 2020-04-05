@@ -62,9 +62,12 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.1.1</version>
                 <configuration>
+                    <!-- Include links to Bukkit API for Bukkit objects -->
                     <links>
                         <link>https://hub.spigotmc.org/javadocs/spigot/</link>
                     </links>
+                    <!-- Exclude plugin related stuff from JavaDocs -->
+                    <excludePackageNames>com.shanebeestudios.vf:com.shanebeestudios.vf.command:com.shanebeestudios.vf.debug</excludePackageNames>
                 </configuration>
             </plugin>
         </plugins>
