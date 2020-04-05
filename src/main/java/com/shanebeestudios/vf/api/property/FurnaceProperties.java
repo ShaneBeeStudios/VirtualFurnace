@@ -1,74 +1,72 @@
-package com.shanebeestudios.vf.api.machine;
+package com.shanebeestudios.vf.api.property;
 
+import com.shanebeestudios.vf.api.machine.Furnace;
 import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Properties for furnaces
+ * <p>Used to manipulate the speed properties of a furnace</p>
  */
 @SuppressWarnings({"unused", "SameParameterValue"})
-public class Properties implements Keyed, ConfigurationSerializable {
-
-    private static final Map<NamespacedKey, Properties> KEY_MAP = new HashMap<>();
+public class FurnaceProperties extends Properties implements Keyed, ConfigurationSerializable {
 
     /**
      * Pre-made property to mimic a vanilla Minecraft furnace
      * <p>Cook speed = 1.0
      * <br>Fuel speed = 1.0</p>
      */
-    public static final Properties FURNACE = build("furnace", 1.0, 1.0);
+    public static final FurnaceProperties FURNACE = build("furnace", 1.0, 1.0);
     /**
      * Pre-made property to mimic a vanilla Minecraft blast furnace
      * <p>Cook speed = 2.0
      * <br>Fuel speed = 1.0</p>
      */
-    public static final Properties BLAST_FURNACE = build("blast_furnace", 2.0, 1.0);
+    public static final FurnaceProperties BLAST_FURNACE = build("blast_furnace", 2.0, 1.0);
     /**
      * Pre-made property to mimic a vanilla Minecraft smoker
      * <p>Cook speed = 2.0
      * <br>Fuel speed = 1.0</p>
      */
-    public static final Properties SMOKER = build("smoker", 2.0, 1.0);
+    public static final FurnaceProperties SMOKER = build("smoker", 2.0, 1.0);
 
-    private static Properties build(String key, double cookX, double fuelX) {
-        return new Properties("properties_" + key).cookMultiplier(cookX).fuelMultiplier(fuelX);
+    private static FurnaceProperties build(String key, double cookX, double fuelX) {
+        return new FurnaceProperties("properties_" + key).cookMultiplier(cookX).fuelMultiplier(fuelX);
     }
 
-    private static Properties getProperty(String key) {
+    private static FurnaceProperties getProperty(String key) {
         for (NamespacedKey namespacedKey : KEY_MAP.keySet()) {
             if (namespacedKey.getKey().equalsIgnoreCase(key)) {
-                return KEY_MAP.get(namespacedKey);
+                return (FurnaceProperties) KEY_MAP.get(namespacedKey);
             }
         }
         return null;
     }
 
-    private final NamespacedKey key;
     private double cookX;
     private double fuelX;
 
     /** Create a new property for use in a {@link Furnace}
      * @param key Key for this property
      */
-    public Properties(String key) {
-        this.key = Util.getKey(key.toLowerCase());
+    public FurnaceProperties(String key) {
+        super(Util.getKey(key.toLowerCase()));
         this.cookX = 1.0;
         this.fuelX = 1.0;
-        KEY_MAP.put(this.key, this);
+        //KEY_MAP.put(this.key, this);
     }
 
     /** Set the cook speed multiplier for this property
      * @param amount Speed multiplier to set
      * @return Returns an instance of itself with the speed multiplier changed
      */
-    public Properties cookMultiplier(double amount) {
+    public FurnaceProperties cookMultiplier(double amount) {
         this.cookX = amount;
         return this;
     }
@@ -84,7 +82,7 @@ public class Properties implements Keyed, ConfigurationSerializable {
      * @param amount Speed multiplier to set
      * @return Returns an instance of itself with the speed multiplier changed
      */
-    public Properties fuelMultiplier(double amount) {
+    public FurnaceProperties fuelMultiplier(double amount) {
         this.fuelX = amount;
         return this;
     }
@@ -120,15 +118,15 @@ public class Properties implements Keyed, ConfigurationSerializable {
         return result;
     }
 
-    public static Properties deserialize(Map<String, Object> args) {
+    public static FurnaceProperties deserialize(Map<String, Object> args) {
         String stringKey = ((String) args.get("key")).split(":")[1];
         double cook = (double) args.get("cookX");
         double fuel = (double) args.get("fuelX");
-        Properties properties = getProperty(stringKey);
-        if (properties != null) {
-            return properties;
+        FurnaceProperties furnaceProperties = getProperty(stringKey);
+        if (furnaceProperties != null) {
+            return furnaceProperties;
         } else {
-            return new Properties(stringKey).cookMultiplier(cook).fuelMultiplier(fuel);
+            return new FurnaceProperties(stringKey).cookMultiplier(cook).fuelMultiplier(fuel);
         }
     }
 

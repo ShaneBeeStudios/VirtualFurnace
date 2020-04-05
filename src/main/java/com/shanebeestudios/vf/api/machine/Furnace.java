@@ -2,6 +2,8 @@ package com.shanebeestudios.vf.api.machine;
 
 import com.shanebeestudios.vf.api.RecipeManager;
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
+import com.shanebeestudios.vf.api.property.FurnaceProperties;
+import com.shanebeestudios.vf.api.property.PropertyHolder;
 import com.shanebeestudios.vf.api.recipe.Fuel;
 import com.shanebeestudios.vf.api.recipe.FurnaceRecipe;
 import com.shanebeestudios.vf.api.util.Util;
@@ -24,11 +26,9 @@ import java.util.UUID;
  * Virtual furnace object
  */
 @SuppressWarnings("unused")
-public class Furnace implements InventoryHolder, ConfigurationSerializable {
+public class Furnace extends Machine implements PropertyHolder<FurnaceProperties>, InventoryHolder, ConfigurationSerializable {
 
-    private final String name;
-    private final UUID uuid;
-    private final Properties properties;
+    private final FurnaceProperties furnaceProperties;
     private final RecipeManager recipeManager;
     private ItemStack fuel;
     private ItemStack input;
@@ -43,12 +43,12 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
      * Create a new furnace object
      * <p><b>NOTE:</b> Creating a furnace object using this method will not tick the furnace.</p>
      * <p>It is recommended to use <b>{@link com.shanebeestudios.vf.api.FurnaceManager#createFurnace(String)}</b></p>
-     * <p><b>NOTE:</b> The properties used for this furnace will be <b>{@link Properties#FURNACE}</b></p>
+     * <p><b>NOTE:</b> The properties used for this furnace will be <b>{@link FurnaceProperties#FURNACE}</b></p>
      *
      * @param name Name of the object which will show up in the UI
      */
     public Furnace(String name) {
-        this(name, Properties.FURNACE);
+        this(name, FurnaceProperties.FURNACE);
     }
 
     /**
@@ -57,12 +57,11 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
      * <p>It is recommended to use <b>{@link com.shanebeestudios.vf.api.FurnaceManager#createFurnace(String)}</b></p>
      *
      * @param name       Name of the object which will show up in the UI
-     * @param properties Property for this furnace
+     * @param furnaceProperties Property for this furnace
      */
-    public Furnace(String name, Properties properties) {
-        this.name = name;
-        this.uuid = UUID.randomUUID();
-        this.properties = properties;
+    public Furnace(String name, FurnaceProperties furnaceProperties) {
+        super(UUID.randomUUID(), name);
+        this.furnaceProperties = furnaceProperties;
         this.recipeManager = VirtualFurnaceAPI.getInstance().getRecipeManager();
         this.cookTime = 0;
         this.cookTimeTotal = 0;
@@ -76,16 +75,15 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     }
 
     // Used for deserializer
-    private Furnace(String name, UUID uuid, int cookTime, int fuelTime, ItemStack fuel, ItemStack input, ItemStack output, Properties properties) {
-        this.name = name;
-        this.uuid = uuid;
+    private Furnace(String name, UUID uuid, int cookTime, int fuelTime, ItemStack fuel, ItemStack input, ItemStack output, FurnaceProperties furnaceProperties) {
+        super(uuid, name);
         this.recipeManager = VirtualFurnaceAPI.getInstance().getRecipeManager();
         this.cookTime = cookTime;
         this.fuelTime = fuelTime;
         this.fuel = fuel;
         this.input = input;
         this.output = output;
-        this.properties = properties;
+        this.furnaceProperties = furnaceProperties;
 
         FurnaceRecipe furnaceRecipe = recipeManager.getByIngredient(input != null ? input.getType() : null);
         if (furnaceRecipe != null) {
@@ -103,31 +101,15 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         this.updateInventory();
     }
 
-    /**
-     * Get this furnace's name
-     *
-     * @return Name of this furnace
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Get this furnace's UUID
-     *
-     * @return UUID of this furnace
-     */
-    public UUID getUuid() {
-        return uuid;
-    }
 
     /**
      * Get the properties associated with this furnace
      *
      * @return Properties associated with this furnace
      */
-    public Properties getProperties() {
-        return this.properties;
+    @Override
+    public FurnaceProperties getProperties() {
+        return this.furnaceProperties;
     }
 
     /**
@@ -227,6 +209,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
      * <p>This will process the fuel, cook the input item
      * and update the inventory</p>
      */
+    @Override
     public void tick() {
         if (this.fuelTime > 0) {
             this.fuelTime--;
@@ -265,8 +248,8 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         } else {
             this.fuel = null;
         }
-        this.fuelTime = (int) (fuel.getBurnTime() / properties.getFuelMultiplier());
-        this.fuelTimeTotal = (int) (fuel.getBurnTime() / properties.getFuelMultiplier());
+        this.fuelTime = (int) (fuel.getBurnTime() / furnaceProperties.getFuelMultiplier());
+        this.fuelTimeTotal = (int) (fuel.getBurnTime() / furnaceProperties.getFuelMultiplier());
         updateInventory();
     }
 
@@ -274,7 +257,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         if (this.input == null) return false;
         FurnaceRecipe result = this.recipeManager.getByIngredient(this.input.getType());
         if (result == null) return false;
-        this.cookTimeTotal = (int) (result.getCookTime() / properties.getCookMultiplier());
+        this.cookTimeTotal = (int) (result.getCookTime() / furnaceProperties.getCookMultiplier());
         return this.output == null || this.output.getType() == result.getResult();
     }
 
@@ -298,9 +281,9 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     @Override
     public String toString() {
         return "Furnace{" +
-                "name='" + name + '\'' +
-                ", uuid=" + uuid +
-                ", properties=" + properties +
+                "name='" + getName() + '\'' +
+                ", uuid=" + getUniqueID() +
+                ", properties=" + furnaceProperties +
                 ", fuel=" + fuel +
                 ", input=" + input +
                 ", output=" + output +
@@ -319,9 +302,9 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     @Override
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("name", this.name);
-        result.put("uuid", this.uuid.toString());
-        result.put("properties", this.properties);
+        result.put("name", this.getName());
+        result.put("uuid", this.getUniqueID().toString());
+        result.put("properties", this.furnaceProperties);
         result.put("cookTime", this.cookTime);
         result.put("fuelTime", this.fuelTime);
         result.put("fuel", this.fuel);
@@ -340,13 +323,13 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     public static Furnace deserialize(Map<String, Object> args) {
         String name = ((String) args.get("name"));
         UUID uuid = UUID.fromString(((String) args.get("uuid")));
-        Properties properties = (Properties) args.get("properties");
+        FurnaceProperties furnaceProperties = (FurnaceProperties) args.get("properties");
         int cookTime = ((Number) args.get("cookTime")).intValue();
         int fuelTime = ((Number) args.get("fuelTime")).intValue();
         ItemStack fuel = ((ItemStack) args.get("fuel"));
         ItemStack input = ((ItemStack) args.get("input"));
         ItemStack output = ((ItemStack) args.get("output"));
-        return new Furnace(name, uuid, cookTime, fuelTime, fuel, input, output, properties);
+        return new Furnace(name, uuid, cookTime, fuelTime, fuel, input, output, furnaceProperties);
     }
 
 }
