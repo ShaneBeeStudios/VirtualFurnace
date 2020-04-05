@@ -59,7 +59,6 @@ public class VirtualFurnace extends JavaPlugin {
     private void registerRecipes() {
         for (FurnaceRecipe recipe : FurnaceRecipe.getVanillaFurnaceRecipes()) {
             this.recipeManager.registerFurnaceRecipe(recipe);
-            Util.log("&7Registering recipe: &b" + recipe.toString());
         }
     }
 
