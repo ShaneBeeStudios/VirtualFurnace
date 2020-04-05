@@ -12,7 +12,7 @@ public class Util {
     private static final String[] VERSION = Bukkit.getServer().getBukkitVersion().split("-")[0].split("\\.");
 
     /**
-     * Get a string using '&' color code
+     * Get a string using color codes
      * <p>Mainly used internally</p>
      *
      * @param string String with color codes

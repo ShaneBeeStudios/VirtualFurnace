@@ -240,7 +240,7 @@ public class FurnaceManager {
     }
 
     /**
-     * Save current furnace YAML from RAM -> file
+     * Save current furnace YAML from RAM to file
      */
     public void saveConfig() {
         try {
