@@ -1,6 +1,7 @@
 package com.shanebeestudios.vf.api;
 
 import com.shanebeestudios.vf.api.machine.Furnace;
+import com.shanebeestudios.vf.api.machine.Properties;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
@@ -65,24 +66,51 @@ public class FurnaceManager {
     /**
      * Create a new furnace
      * <p>This will create a new furnace, add it to the tick list, and save to file</p>
+     * <p><b>NOTE:</b> The default <b>{@link Properties}</b> associated with this furnace will be <b>{@link Properties#FURNACE}</b></p>
      *
      * @param name Name of new furnace (This shows up in the inventory view)
      * @return Instance of this new furnace
      */
     public Furnace createFurnace(@NotNull String name) {
-        return createFurnace(name, null);
+        return createFurnace(name, Properties.FURNACE, null);
     }
 
     /**
      * Create a new furnace
      * <p>This will create a new furnace, add it to the tick list, and save to file</p>
      *
+     * @param name       Name of new furnace (This shows up in the inventory view)
+     * @param properties Properties to apply to this furnace
+     * @return Instance of this new furnace
+     */
+    public Furnace createFurnace(@NotNull String name, @NotNull Properties properties) {
+        return createFurnace(name, properties, null);
+    }
+
+    /**
+     * Create a new furnace
+     * <p>This will create a new furnace, add it to the tick list, and save to file</p>
+     * <p><b>NOTE:</b> The default <b>{@link Properties}</b> associated with this furnace will be <b>{@link Properties#FURNACE}</b></p>
+     *
      * @param name     Name of new furnace (This shows up in the inventory view)
      * @param function Function to run before furnace is created
      * @return Instance of this new furnace
      */
-    public Furnace createFurnace(@NotNull String name, @Nullable Consumer<Furnace> function) {
-        Furnace furnace = new Furnace(name);
+    public Furnace createFurnace(@NotNull String name, @NotNull Consumer<Furnace> function) {
+        return createFurnace(name, Properties.FURNACE, function);
+    }
+
+    /**
+     * Create a new furnace
+     * <p>This will create a new furnace, add it to the tick list, and save to file</p>
+     *
+     * @param name       Name of new furnace (This shows up in the inventory view)
+     * @param properties Properties to apply to this furnace
+     * @param function   Function to run before furnace is created
+     * @return Instance of this new furnace
+     */
+    public Furnace createFurnace(@NotNull String name, @NotNull Properties properties, @Nullable Consumer<Furnace> function) {
+        Furnace furnace = new Furnace(name, properties);
         if (function != null) {
             function.accept(furnace);
         }
@@ -93,6 +121,7 @@ public class FurnaceManager {
 
     /**
      * Create a {@link Furnace} that is attached to an {@link ItemStack}
+     * <p><b>NOTE:</b> The default <b>{@link Properties}</b> associated with this furnace will be <b>{@link Properties#FURNACE}</b></p>
      *
      * @param name     Name of furnace (this will show up in the furnace UI)
      * @param material Material of the new ItemStack
@@ -106,6 +135,20 @@ public class FurnaceManager {
     /**
      * Create a {@link Furnace} that is attached to an {@link ItemStack}
      *
+     * @param name       Name of furnace (this will show up in the furnace UI)
+     * @param properties Properties associated with this furnace item
+     * @param material   Material of the new ItemStack
+     * @param glowing    Whether the item should glow (enchanted)
+     * @return New ItemStack with a furnace attached
+     */
+    public ItemStack createItemWithFurnace(@NotNull String name, @NotNull Properties properties, @NotNull Material material, boolean glowing) {
+        return createItemWithFurnace(name, properties, new ItemStack(material), glowing);
+    }
+
+    /**
+     * Create a {@link Furnace} that is attached to an {@link ItemStack}
+     * <p><b>NOTE:</b> The default <b>{@link Properties}</b> associated with this furnace will be <b>{@link Properties#FURNACE}</b></p>
+     *
      * @param name     Name of furnace (this will show up in the furnace UI)
      * @param material Material of the new ItemStack
      * @param glowing  Whether the item should glow (enchanted)
@@ -114,6 +157,20 @@ public class FurnaceManager {
      */
     public ItemStack createItemWithFurnace(@NotNull String name, @NotNull Material material, boolean glowing, @Nullable Consumer<Furnace> function) {
         return createItemWithFurnace(name, new ItemStack(material), glowing, function);
+    }
+
+    /**
+     * Create a {@link Furnace} that is attached to an {@link ItemStack}
+     *
+     * @param name       Name of furnace (this will show up in the furnace UI)
+     * @param properties Properties associated with this furnace item
+     * @param material   Material of the new ItemStack
+     * @param glowing    Whether the item should glow (enchanted)
+     * @param function   Function to run before furnace is created
+     * @return New ItemStack with a furnace attached
+     */
+    public ItemStack createItemWithFurnace(@NotNull String name, @NotNull Properties properties, @NotNull Material material, boolean glowing, @Nullable Consumer<Furnace> function) {
+        return createItemWithFurnace(name, properties, new ItemStack(material), glowing, function);
     }
 
     /**
@@ -131,6 +188,20 @@ public class FurnaceManager {
     /**
      * Create a {@link Furnace} that is attached to an {@link ItemStack}
      *
+     * @param name       Name of furnace (this will show up in the furnace UI)
+     * @param properties Properties associated with this furnace item
+     * @param itemStack  ItemStack to be copied and have a furnace attached
+     * @param glowing    Whether the item should glow (enchanted)
+     * @return Clone of the input ItemStack with a furnace attached
+     */
+    public ItemStack createItemWithFurnace(@NotNull String name, @NotNull Properties properties, @NotNull ItemStack itemStack, boolean glowing) {
+        return createItemWithFurnace(name, properties, itemStack, glowing, null);
+    }
+
+    /**
+     * Create a {@link Furnace} that is attached to an {@link ItemStack}
+     * <p><b>NOTE:</b> The default <b>{@link Properties}</b> associated with this furnace will be <b>{@link Properties#FURNACE}</b></p>
+     *
      * @param name      Name of furnace (this will show up in the furnace UI)
      * @param itemStack ItemStack to be copied and have a furnace attached
      * @param glowing   Whether the item should glow (enchanted)
@@ -138,6 +209,20 @@ public class FurnaceManager {
      * @return Clone of the input ItemStack with a furnace attached
      */
     public ItemStack createItemWithFurnace(@NotNull String name, @NotNull ItemStack itemStack, boolean glowing, @Nullable Consumer<Furnace> function) {
+        return createItemWithFurnace(name, Properties.FURNACE, itemStack, glowing, function);
+    }
+
+    /**
+     * Create a {@link Furnace} that is attached to an {@link ItemStack}
+     *
+     * @param name       Name of furnace (this will show up in the furnace UI)
+     * @param properties Properties associated with this furnace item
+     * @param itemStack  ItemStack to be copied and have a furnace attached
+     * @param glowing    Whether the item should glow (enchanted)
+     * @param function   Function to run before furnace is created
+     * @return Clone of the input ItemStack with a furnace attached
+     */
+    public ItemStack createItemWithFurnace(@NotNull String name, @NotNull Properties properties, @NotNull ItemStack itemStack, boolean glowing, @Nullable Consumer<Furnace> function) {
         ItemStack item = itemStack.clone();
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
@@ -151,9 +236,9 @@ public class FurnaceManager {
         }
         Furnace furnace;
         if (function == null) {
-            furnace = createFurnace(name);
+            furnace = createFurnace(name, properties);
         } else {
-            furnace = createFurnace(name, function);
+            furnace = createFurnace(name, properties, function);
         }
         meta.getPersistentDataContainer().set(this.key, PersistentDataType.STRING, furnace.getUuid().toString());
         item.setItemMeta(meta);
