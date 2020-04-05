@@ -2,6 +2,7 @@ package com.shanebeestudios.vf.command;
 
 import com.shanebeestudios.vf.api.FurnaceManager;
 import com.shanebeestudios.vf.VirtualFurnace;
+import com.shanebeestudios.vf.api.property.FurnaceProperties;
 import com.shanebeestudios.vf.debug.Debug;
 import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.ChatColor;
@@ -70,6 +71,24 @@ public class FurnaceCommand implements CommandExecutor {
                                 meta.setDisplayName(Util.getColString(name));
                                 itemStack.setItemMeta(meta);
                                 player.getInventory().addItem(this.furnaceManager.createItemWithFurnace(name, itemStack, true));
+
+                                ItemStack smokerItem = new ItemStack(Material.SMOKER);
+                                String smokerName = "&2Portable Smoker";
+                                ItemMeta smokerMeta = smokerItem.getItemMeta();
+                                assert smokerMeta != null;
+                                smokerMeta.setDisplayName(Util.getColString(smokerName));
+                                smokerItem.setItemMeta(smokerMeta);
+                                player.getInventory().addItem(this.furnaceManager.createItemWithFurnace(smokerName, FurnaceProperties.SMOKER,smokerItem, true));
+
+                                ItemStack fastItem = new ItemStack(Material.BLAST_FURNACE);
+                                String fastName = "&6Fast Food";
+                                ItemMeta fastMeta = fastItem.getItemMeta();
+                                assert fastMeta != null;
+                                fastMeta.setDisplayName(Util.getColString(fastName));
+                                fastItem.setItemMeta(fastMeta);
+                                FurnaceProperties properties = new FurnaceProperties("fast").cookMultiplier(10.0);
+                                ItemStack i = this.furnaceManager.createItemWithFurnace(fastName, properties, fastItem, true);
+                                player.getInventory().addItem(i);
                                 break;
                             case "clone":
                                 ItemStack item = player.getInventory().getItemInMainHand();
@@ -81,7 +100,7 @@ public class FurnaceCommand implements CommandExecutor {
                         ItemStack item = player.getInventory().getItemInMainHand();
                         Furnace furnace = this.furnaceManager.getFurnaceFromItemStack(item);
                         if (furnace != null) {
-                            player.sendMessage("Portable furnace ID: " + furnace.getUuid().toString());
+                            player.sendMessage("Portable furnace ID: " + furnace.getUniqueID().toString());
                         } else {
                             player.sendMessage("This item has no ID!");
                         }
