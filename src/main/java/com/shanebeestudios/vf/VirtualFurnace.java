@@ -8,8 +8,6 @@ import com.shanebeestudios.vf.api.recipe.FurnaceRecipe;
 import com.shanebeestudios.vf.api.task.FurnaceTick;
 import com.shanebeestudios.vf.api.util.Util;
 import com.shanebeestudios.vf.command.FurnaceCommand;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -19,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class VirtualFurnace extends JavaPlugin {
 
     private static VirtualFurnace instance;
+    private VirtualFurnaceAPI virtualFurnaceAPI;
     private RecipeManager recipeManager;
     private FurnaceManager furnaceManager;
     private FurnaceTick furnaceTick;
@@ -27,12 +26,17 @@ public class VirtualFurnace extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        VirtualFurnaceAPI virtualFurnaceAPI = new VirtualFurnaceAPI(this);
+        long start = System.currentTimeMillis();
+        Util.log("&7Setting up &bVirtualFurnaceAPI");
+        this.virtualFurnaceAPI = new VirtualFurnaceAPI(this);
         this.recipeManager = virtualFurnaceAPI.getRecipeManager();
         this.furnaceManager = virtualFurnaceAPI.getFurnaceManager();
         this.furnaceTick = virtualFurnaceAPI.getFurnaceTick();
 
         registerCommands();
+        registerRecipes();
+        registerFuels();
+        Util.log("&7Setup &asuccessful&7 in &b" + (System.currentTimeMillis() - start) + " &7milliseconds");
     }
 
     @Override
@@ -43,6 +47,9 @@ public class VirtualFurnace extends JavaPlugin {
         Util.log("Furnaces saved &asuccessfully!");
         this.furnaceTick.cancel();
         this.furnaceTick = null;
+        this.furnaceManager = null;
+        this.recipeManager = null;
+        this.virtualFurnaceAPI = null;
     }
     @SuppressWarnings("ConstantConditions")
     private void registerCommands() {
@@ -50,46 +57,16 @@ public class VirtualFurnace extends JavaPlugin {
     }
 
     private void registerRecipes() {
-        FurnaceRecipe chicken = new FurnaceRecipe(getKey("chicken"), Material.CHICKEN, Material.COOKED_CHICKEN, 200);
-        FurnaceRecipe beef = new FurnaceRecipe(getKey("beef"), Material.BEEF, Material.COOKED_BEEF, 100);
-        FurnaceRecipe pork = new FurnaceRecipe(getKey("pork"), Material.PORKCHOP, Material.COOKED_PORKCHOP, 20);
-
-        this.recipeManager.registerFurnaceRecipe(chicken);
-        this.recipeManager.registerFurnaceRecipe(beef);
-        this.recipeManager.registerFurnaceRecipe(pork);
-    }
-
-    private void registerFuels() {
-        /* KEEP for examples
-        Fuel coal = new Fuel(getKey("coal"), Material.COAL, 1600);
-        Fuel charcoal = new Fuel(getKey("charcoal"), Material.CHARCOAL, 1000);
-        Fuel planks = new Fuel(getKey("planks"), Tag.PLANKS, 100);
-
-        this.recipeManager.registerFuel(coal);
-        this.recipeManager.registerFuel(charcoal);
-        this.recipeManager.registerFuel(planks);
-         */
-        for (Fuel fuel : Fuel.getVanillaFuels()) {
-            this.recipeManager.registerFuel(fuel);
+        for (FurnaceRecipe recipe : FurnaceRecipe.getVanillaFurnaceRecipes()) {
+            this.recipeManager.registerFurnaceRecipe(recipe);
+            Util.log("&7Registering recipe: &b" + recipe.toString());
         }
     }
 
-    /**
-     * Register a new {@link FurnaceRecipe}
-     *
-     * @param recipe new FurnaceRecipe to register
-     */
-    public static void registerFurnaceRecipe(FurnaceRecipe recipe) {
-        instance.recipeManager.registerFurnaceRecipe(recipe);
-    }
-
-    /**
-     * Register a new {@link Fuel}
-     *
-     * @param fuel new Fuel to register
-     */
-    public static void registerFuel(Fuel fuel) {
-        instance.recipeManager.registerFuel(fuel);
+    private void registerFuels() {
+        for (Fuel fuel : Fuel.getVanillaFuels()) {
+            this.recipeManager.registerFuel(fuel);
+        }
     }
 
     /**
@@ -119,8 +96,11 @@ public class VirtualFurnace extends JavaPlugin {
         return furnaceManager;
     }
 
-    private NamespacedKey getKey(String key) {
-        return new NamespacedKey(this, key);
+    /** Get an instance of the {@link VirtualFurnaceAPI}
+     * @return Instance of VirtualFurnaceAPI
+     */
+    public VirtualFurnaceAPI getVirtualFurnaceAPI() {
+        return virtualFurnaceAPI;
     }
 
 }
