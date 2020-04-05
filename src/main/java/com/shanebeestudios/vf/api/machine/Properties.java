@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Properties for furnaces
+ */
 @SuppressWarnings({"unused", "SameParameterValue"})
 public class Properties implements Keyed, ConfigurationSerializable {
 
