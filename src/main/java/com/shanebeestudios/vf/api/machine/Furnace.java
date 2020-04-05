@@ -28,6 +28,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
 
     private final String name;
     private final UUID uuid;
+    private final Properties properties;
     private final RecipeManager recipeManager;
     private ItemStack fuel;
     private ItemStack input;
@@ -38,14 +39,30 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     private int fuelTimeTotal;
     private final Inventory inventory;
 
-    /** Create a new furnace object
+    /**
+     * Create a new furnace object
      * <p><b>NOTE:</b> Creating a furnace object using this method will not tick the furnace.</p>
      * <p>It is recommended to use <b>{@link com.shanebeestudios.vf.api.FurnaceManager#createFurnace(String)}</b></p>
+     * <p><b>NOTE:</b> The properties used for this furnace will be <b>{@link Properties#FURNACE}</b></p>
+     *
      * @param name Name of the object which will show up in the UI
      */
     public Furnace(String name) {
+        this(name, Properties.FURNACE);
+    }
+
+    /**
+     * Create a new furnace object
+     * <p><b>NOTE:</b> Creating a furnace object using this method will not tick the furnace.</p>
+     * <p>It is recommended to use <b>{@link com.shanebeestudios.vf.api.FurnaceManager#createFurnace(String)}</b></p>
+     *
+     * @param name       Name of the object which will show up in the UI
+     * @param properties Property for this furnace
+     */
+    public Furnace(String name, Properties properties) {
         this.name = name;
         this.uuid = UUID.randomUUID();
+        this.properties = properties;
         this.recipeManager = VirtualFurnaceAPI.getInstance().getRecipeManager();
         this.cookTime = 0;
         this.cookTimeTotal = 0;
@@ -58,7 +75,8 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         this.updateInventory();
     }
 
-    private Furnace(String name, UUID uuid, int cookTime, int fuelTime, ItemStack fuel, ItemStack input, ItemStack output) {
+    // Used for deserializer
+    private Furnace(String name, UUID uuid, int cookTime, int fuelTime, ItemStack fuel, ItemStack input, ItemStack output, Properties properties) {
         this.name = name;
         this.uuid = uuid;
         this.recipeManager = VirtualFurnaceAPI.getInstance().getRecipeManager();
@@ -67,6 +85,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         this.fuel = fuel;
         this.input = input;
         this.output = output;
+        this.properties = properties;
 
         FurnaceRecipe furnaceRecipe = recipeManager.getByIngredient(input != null ? input.getType() : null);
         if (furnaceRecipe != null) {
@@ -84,63 +103,90 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         this.updateInventory();
     }
 
-    /** Get this furnace's name
+    /**
+     * Get this furnace's name
+     *
      * @return Name of this furnace
      */
     public String getName() {
         return name;
     }
 
-    /** Get this furnace's UUID
+    /**
+     * Get this furnace's UUID
+     *
      * @return UUID of this furnace
      */
     public UUID getUuid() {
         return uuid;
     }
 
-    /** Get this furnace's inventory
+    /**
+     * Get the properties associated with this furnace
+     *
+     * @return Properties associated with this furnace
+     */
+    public Properties getProperties() {
+        return this.properties;
+    }
+
+    /**
+     * Get this furnace's inventory
+     *
      * @return Inventory
      */
     public @NotNull Inventory getInventory() {
         return inventory;
     }
 
-    /** Get this furnace's current fuel
+    /**
+     * Get this furnace's current fuel
+     *
      * @return Current fuel
      */
     public ItemStack getFuel() {
         return fuel;
     }
 
-    /** Set this furnace's fuel
+    /**
+     * Set this furnace's fuel
+     *
      * @param fuel Fuel to set
      */
     public void setFuel(ItemStack fuel) {
         this.fuel = fuel;
     }
 
-    /** Get this furnace's current input ItemStack
+    /**
+     * Get this furnace's current input ItemStack
+     *
      * @return Current input
      */
     public ItemStack getInput() {
         return input;
     }
 
-    /** Set this furnace's input ItemStack
+    /**
+     * Set this furnace's input ItemStack
+     *
      * @param input ItemStack to set
      */
     public void setInput(ItemStack input) {
         this.input = input;
     }
 
-    /** Get this furnace's output ItemStack
+    /**
+     * Get this furnace's output ItemStack
+     *
      * @return Output itemstack
      */
     public ItemStack getOutput() {
         return output;
     }
 
-    /** Open this furnace's inventory to a player
+    /**
+     * Open this furnace's inventory to a player
+     *
      * @param player Player to open inventory to
      */
     public void openInventory(Player player) {
@@ -175,17 +221,6 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
             view.setProperty(InventoryView.Property.TICKS_FOR_CURRENT_FUEL, this.fuelTimeTotal);
         }
     }
-
-    /*
-    private void updateInventoryFromView() {
-        for (HumanEntity entity : this.inventory.getViewers()) {
-            InventoryView view = entity.getOpenInventory();
-            this.input = view.getItem(0);
-            this.fuel = view.getItem(1);
-            this.output = view.getItem(2);
-        }
-    }
-     */
 
     /**
      * Tick this furnace
@@ -230,8 +265,8 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         } else {
             this.fuel = null;
         }
-        this.fuelTime = fuel.getBurnTime();
-        this.fuelTimeTotal = fuel.getBurnTime();
+        this.fuelTime = (int) (fuel.getBurnTime() / properties.getFuelMultiplier());
+        this.fuelTimeTotal = (int) (fuel.getBurnTime() / properties.getFuelMultiplier());
         updateInventory();
     }
 
@@ -239,7 +274,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         if (this.input == null) return false;
         FurnaceRecipe result = this.recipeManager.getByIngredient(this.input.getType());
         if (result == null) return false;
-        this.cookTimeTotal = result.getCookTime();
+        this.cookTimeTotal = (int) (result.getCookTime() / properties.getCookMultiplier());
         return this.output == null || this.output.getType() == result.getResult();
     }
 
@@ -265,6 +300,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         return "Furnace{" +
                 "name='" + name + '\'' +
                 ", uuid=" + uuid +
+                ", properties=" + properties +
                 ", fuel=" + fuel +
                 ", input=" + input +
                 ", output=" + output +
@@ -285,6 +321,7 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("name", this.name);
         result.put("uuid", this.uuid.toString());
+        result.put("properties", this.properties);
         result.put("cookTime", this.cookTime);
         result.put("fuelTime", this.fuelTime);
         result.put("fuel", this.fuel);
@@ -303,12 +340,13 @@ public class Furnace implements InventoryHolder, ConfigurationSerializable {
     public static Furnace deserialize(Map<String, Object> args) {
         String name = ((String) args.get("name"));
         UUID uuid = UUID.fromString(((String) args.get("uuid")));
+        Properties properties = (Properties) args.get("properties");
         int cookTime = ((Number) args.get("cookTime")).intValue();
         int fuelTime = ((Number) args.get("fuelTime")).intValue();
         ItemStack fuel = ((ItemStack) args.get("fuel"));
         ItemStack input = ((ItemStack) args.get("input"));
         ItemStack output = ((ItemStack) args.get("output"));
-        return new Furnace(name, uuid, cookTime, fuelTime, fuel, input, output);
+        return new Furnace(name, uuid, cookTime, fuelTime, fuel, input, output, properties);
     }
 
 }
