@@ -1,6 +1,7 @@
 package com.shanebeestudios.vf.api;
 
 import com.shanebeestudios.vf.api.machine.Furnace;
+import com.shanebeestudios.vf.api.machine.Properties;
 import com.shanebeestudios.vf.api.task.FurnaceTick;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -14,6 +15,7 @@ public class VirtualFurnaceAPI {
 
     static {
         ConfigurationSerialization.registerClass(Furnace.class, "furnace");
+        ConfigurationSerialization.registerClass(Properties.class, "properties");
     }
 
     private static VirtualFurnaceAPI instance;
