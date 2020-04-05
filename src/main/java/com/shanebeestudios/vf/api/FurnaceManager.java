@@ -77,7 +77,7 @@ public class FurnaceManager {
      * Create a new furnace
      * <p>This will create a new furnace, add it to the tick list, and save to file</p>
      *
-     * @param name Name of new furnace (This shows up in the inventory view)
+     * @param name     Name of new furnace (This shows up in the inventory view)
      * @param function Function to run before furnace is created
      * @return Instance of this new furnace
      */
@@ -199,16 +199,39 @@ public class FurnaceManager {
         }
     }
 
-    private void saveFurnace(Furnace furnace, boolean save) {
+    /**
+     * Save a furnace to YAML storage
+     * <p><b>NOTE:</b> If choosing not to save to file, this change will not take effect
+     * in the YAML file, this may be useful for saving a large batch and saving file at the
+     * end of the batch change, use {@link #saveConfig()} to save all changes to file</p>
+     *
+     * @param furnace    Furnace to save
+     * @param saveToFile Whether to save to file
+     */
+    public void saveFurnace(@NotNull Furnace furnace, boolean saveToFile) {
         this.furnaceConfig.set("furnaces." + furnace.getUuid(), furnace);
-        if (save)
+        if (saveToFile)
             saveConfig();
     }
 
-    private void removeFurnaceFromConfig(Furnace furnace) {
+    /**
+     * Remove a furnace from YAML storage
+     * <p><b>NOTE:</b> If choosing not to save to file, this change will not take effect
+     * in the YAML file, this may be useful it removing a large batch and saving file at the
+     * end of the batch change, use {@link #saveConfig()} to save all changes to file</p>
+     *
+     * @param furnace    Furnace to remove
+     * @param saveToFile Whether to save changes to file
+     */
+    public void removeFurnaceFromConfig(@NotNull Furnace furnace, boolean saveToFile) {
         this.furnaceConfig.set("furnaces." + furnace.getUuid(), null);
+        if (saveToFile)
+            saveConfig();
     }
 
+    /**
+     * Save all furnaces to file
+     */
     public void saveAll() {
         for (Furnace furnace : this.furnaceMap.values()) {
             saveFurnace(furnace, false);
@@ -216,7 +239,10 @@ public class FurnaceManager {
         saveConfig();
     }
 
-    private void saveConfig() {
+    /**
+     * Save current furnace YAML from RAM -> file
+     */
+    public void saveConfig() {
         try {
             furnaceConfig.save(furnaceFile);
         } catch (IOException e) {
