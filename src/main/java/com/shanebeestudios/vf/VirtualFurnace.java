@@ -8,6 +8,7 @@ import com.shanebeestudios.vf.api.recipe.FurnaceRecipe;
 import com.shanebeestudios.vf.api.task.FurnaceTick;
 import com.shanebeestudios.vf.api.util.Util;
 import com.shanebeestudios.vf.command.FurnaceCommand;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -16,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 @SuppressWarnings("unused")
 public class VirtualFurnace extends JavaPlugin {
 
+    private boolean enabled = true;
     private static VirtualFurnace instance;
     private VirtualFurnaceAPI virtualFurnaceAPI;
     private RecipeManager recipeManager;
@@ -29,6 +31,12 @@ public class VirtualFurnace extends JavaPlugin {
         long start = System.currentTimeMillis();
         Util.log("&7Setting up &bVirtualFurnaceAPI");
         this.virtualFurnaceAPI = new VirtualFurnaceAPI(this);
+        if (!virtualFurnaceAPI.isEnabled()) {
+            Util.log("Failed to load!");
+            this.enabled = false;
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
         this.recipeManager = virtualFurnaceAPI.getRecipeManager();
         this.furnaceManager = virtualFurnaceAPI.getFurnaceManager();
         this.furnaceTick = virtualFurnaceAPI.getFurnaceTick();
@@ -42,6 +50,9 @@ public class VirtualFurnace extends JavaPlugin {
     @Override
     public void onDisable() {
         instance = null;
+        if (!enabled) {
+            return;
+        }
         Util.log("Saving &b" + this.furnaceManager.getAllFurnaces().size() + " &7furnaces...");
         this.furnaceManager.saveAll();
         Util.log("Furnaces saved &asuccessfully!");
@@ -51,6 +62,7 @@ public class VirtualFurnace extends JavaPlugin {
         this.recipeManager = null;
         this.virtualFurnaceAPI = null;
     }
+
     @SuppressWarnings("ConstantConditions")
     private void registerCommands() {
         getCommand("furnace").setExecutor(new FurnaceCommand(this));
@@ -95,7 +107,9 @@ public class VirtualFurnace extends JavaPlugin {
         return furnaceManager;
     }
 
-    /** Get an instance of the {@link VirtualFurnaceAPI}
+    /**
+     * Get an instance of the {@link VirtualFurnaceAPI}
+     *
      * @return Instance of VirtualFurnaceAPI
      */
     public VirtualFurnaceAPI getVirtualFurnaceAPI() {
