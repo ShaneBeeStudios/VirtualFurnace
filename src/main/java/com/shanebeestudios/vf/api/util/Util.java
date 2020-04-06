@@ -74,6 +74,15 @@ public class Util {
     }
 
     /**
+     * Log an error message to console
+     *
+     * @param error Error to log to console
+     */
+    public static void error(String error) {
+        Bukkit.getLogger().severe(getColString(PREFIX + error));
+    }
+
+    /**
      * Log a message to a player/console
      * <p>This message will be prefixed with VirtualFurnace</p>
      *
@@ -84,7 +93,9 @@ public class Util {
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + message));
     }
 
-    /** Check if a class exists
+    /**
+     * Check if a class exists
+     *
      * @param className The {@link Class#getCanonicalName() canonical name} of the class
      * @return True if the class exists
      */
