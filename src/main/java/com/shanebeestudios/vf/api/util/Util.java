@@ -84,4 +84,17 @@ public class Util {
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', PREFIX + message));
     }
 
+    /** Check if a class exists
+     * @param className The {@link Class#getCanonicalName() canonical name} of the class
+     * @return True if the class exists
+     */
+    public static boolean classExists(final String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (ClassNotFoundException ex) {
+            return false;
+        }
+    }
+
 }
