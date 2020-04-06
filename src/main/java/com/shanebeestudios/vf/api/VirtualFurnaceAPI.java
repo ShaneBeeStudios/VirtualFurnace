@@ -22,6 +22,7 @@ public class VirtualFurnaceAPI {
         ConfigurationSerialization.registerClass(FurnaceProperties.class, "furnace_properties");
     }
 
+    private boolean enabled = true;
     private static VirtualFurnaceAPI instance;
     private final String apiVersion;
     private final JavaPlugin plugin;
@@ -38,6 +39,15 @@ public class VirtualFurnaceAPI {
         instance = this;
         this.plugin = javaPlugin;
         this.apiVersion = getVersion();
+        if (!Util.classExists("org.bukkit.persistence.PersistentDataHolder")) {
+            this.recipeManager = null;
+            this.furnaceManager = null;
+            this.furnaceTick = null;
+            Util.error("&cFailed to initialize VirtualFurnaceAPI");
+            Util.error("&7  - Bukkit version: &b" + Bukkit.getBukkitVersion() + " &7is not supported!");
+            this.enabled = false;
+            return;
+        }
         new Metrics(javaPlugin, 7021, this);
         this.recipeManager = new RecipeManager();
         this.furnaceManager = new FurnaceManager(this);
@@ -107,6 +117,15 @@ public class VirtualFurnaceAPI {
      */
     public String getAPIVersion() {
         return this.apiVersion;
+    }
+
+    /**
+     * Check whether or not the API is enabled
+     *
+     * @return True if enabled, false if failed to initialize
+     */
+    public boolean isEnabled() {
+        return this.enabled;
     }
 
     private String getVersion() {
