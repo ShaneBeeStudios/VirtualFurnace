@@ -3,9 +3,13 @@ package com.shanebeestudios.vf.api;
 import com.shanebeestudios.vf.api.machine.Furnace;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
 import com.shanebeestudios.vf.api.task.FurnaceTick;
+import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Main API for VirtualFurnace
@@ -19,6 +23,7 @@ public class VirtualFurnaceAPI {
     }
 
     private static VirtualFurnaceAPI instance;
+    private final String apiVersion;
     private final JavaPlugin plugin;
     private final RecipeManager recipeManager;
     private final FurnaceManager furnaceManager;
@@ -32,10 +37,13 @@ public class VirtualFurnaceAPI {
     public VirtualFurnaceAPI(JavaPlugin javaPlugin) {
         instance = this;
         this.plugin = javaPlugin;
+        this.apiVersion = getVersion();
+        new Metrics(javaPlugin, 7021, this);
         this.recipeManager = new RecipeManager();
         this.furnaceManager = new FurnaceManager(this);
         this.furnaceTick = new FurnaceTick(this);
         Bukkit.getPluginManager().registerEvents(new FurnaceListener(this), javaPlugin);
+        Util.log("Initialized VirtualFurnaceAPI version: &b" + getVersion());
     }
 
     /**
@@ -90,6 +98,25 @@ public class VirtualFurnaceAPI {
      */
     public FurnaceTick getFurnaceTick() {
         return furnaceTick;
+    }
+
+    /**
+     * Get the version of this API
+     *
+     * @return Version of the API
+     */
+    public String getAPIVersion() {
+        return this.apiVersion;
+    }
+
+    private String getVersion() {
+        Properties prop = new Properties();
+        try {
+            prop.load(getJavaPlugin().getResource("VirtualFurnace.properties"));
+            return prop.getProperty("api-version");
+        } catch (IOException e) {
+            return "unknown-version";
+        }
     }
 
 }
