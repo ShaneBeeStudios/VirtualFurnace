@@ -36,6 +36,18 @@ public class VirtualFurnaceAPI {
      * @param javaPlugin Your plugin
      */
     public VirtualFurnaceAPI(JavaPlugin javaPlugin) {
+        this(javaPlugin, false);
+    }
+
+    /**
+     * Create a new instance of the VirtualFurnaceAPI
+     * <p>If you plan on using bStats metrics in your plugin,
+     * disable the bStats metrics for the API to prevent conflict.</p>
+     *
+     * @param javaPlugin     Your plugin
+     * @param disableMetrics Disable metrics for VirtualFurnaceAPI (If you are using metrics in your own plugin)
+     */
+    public VirtualFurnaceAPI(JavaPlugin javaPlugin, boolean disableMetrics) {
         instance = this;
         this.plugin = javaPlugin;
         this.apiVersion = getVersion();
@@ -48,7 +60,9 @@ public class VirtualFurnaceAPI {
             this.enabled = false;
             return;
         }
-        new Metrics(javaPlugin, 7021, this);
+        if (!disableMetrics) {
+            new Metrics(javaPlugin, 7021, this);
+        }
         this.recipeManager = new RecipeManager();
         this.furnaceManager = new FurnaceManager(this);
         this.furnaceTick = new FurnaceTick(this);
