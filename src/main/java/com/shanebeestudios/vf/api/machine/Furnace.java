@@ -2,6 +2,7 @@ package com.shanebeestudios.vf.api.machine;
 
 import com.shanebeestudios.vf.api.RecipeManager;
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
+import com.shanebeestudios.vf.api.event.machine.FurnaceCookEvent;
 import com.shanebeestudios.vf.api.event.machine.FurnaceFuelBurnEvent;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
 import com.shanebeestudios.vf.api.property.PropertyHolder;
@@ -271,11 +272,20 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
     private void processCook() {
         FurnaceRecipe result = this.recipeManager.getByIngredient(this.input.getType());
         if (result == null) return;
+        ItemStack out;
         if (this.output == null) {
-            this.output = new ItemStack(result.getResult());
+            out = new ItemStack(result.getResult());
         } else {
-            this.output.setAmount(this.output.getAmount() + 1);
+            out = this.output.clone();
+            out.setAmount(out.getAmount() + 1);
         }
+
+        FurnaceCookEvent event = new FurnaceCookEvent(this, this.input, out);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return;
+        }
+        this.output = event.getResult();
         int inputAmount = this.input.getAmount();
         if (inputAmount > 1) {
             this.input.setAmount(inputAmount - 1);
