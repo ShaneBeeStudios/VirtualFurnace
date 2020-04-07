@@ -9,10 +9,10 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Called when an ItemStack starts burning as a fuel in a furnace
+ * Called when an ItemStack starts burning as a fuel in a {@link Furnace}
  */
 @SuppressWarnings("unused")
-public class FurnaceBurnFuelEvent extends Event implements Cancellable {
+public class FurnaceFuelBurnEvent extends Event implements Cancellable {
 
     private static final HandlerList handlerList = new HandlerList();
 
@@ -22,7 +22,7 @@ public class FurnaceBurnFuelEvent extends Event implements Cancellable {
     private int burnTime;
     private boolean cancelled;
 
-    public FurnaceBurnFuelEvent(@NotNull Furnace furnace, @NotNull ItemStack fuelItem, @NotNull Fuel fuel, int burnTime) {
+    public FurnaceFuelBurnEvent(@NotNull Furnace furnace, @NotNull ItemStack fuelItem, @NotNull Fuel fuel, int burnTime) {
         this.furnace = furnace;
         this.fuelItem = fuelItem;
         this.fuel = fuel;

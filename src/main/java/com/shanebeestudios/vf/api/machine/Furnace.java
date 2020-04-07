@@ -2,7 +2,7 @@ package com.shanebeestudios.vf.api.machine;
 
 import com.shanebeestudios.vf.api.RecipeManager;
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
-import com.shanebeestudios.vf.api.event.machine.FurnaceBurnFuelEvent;
+import com.shanebeestudios.vf.api.event.machine.FurnaceFuelBurnEvent;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
 import com.shanebeestudios.vf.api.property.PropertyHolder;
 import com.shanebeestudios.vf.api.recipe.Fuel;
@@ -243,7 +243,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
     private void processBurn() {
         Fuel fuel = this.recipeManager.getFuelByMaterial(this.fuel.getType());
         if (fuel == null) return;
-        FurnaceBurnFuelEvent event = new FurnaceBurnFuelEvent(this, this.fuel, fuel, fuel.getBurnTime());
+        FurnaceFuelBurnEvent event = new FurnaceFuelBurnEvent(this, this.fuel, fuel, fuel.getBurnTime());
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return;
