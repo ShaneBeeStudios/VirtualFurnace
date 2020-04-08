@@ -21,6 +21,7 @@ public class FurnaceCookEvent extends Event implements Cancellable {
     private boolean cancelled;
 
     public FurnaceCookEvent(@NotNull Furnace furnace, @NotNull ItemStack source, @NotNull ItemStack result) {
+        super(true);
         this.furnace = furnace;
         this.source = source;
         this.result = result;

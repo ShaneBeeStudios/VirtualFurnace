@@ -23,6 +23,7 @@ public class FurnaceFuelBurnEvent extends Event implements Cancellable {
     private boolean cancelled;
 
     public FurnaceFuelBurnEvent(@NotNull Furnace furnace, @NotNull ItemStack fuelItem, @NotNull Fuel fuel, int burnTime) {
+        super(true);
         this.furnace = furnace;
         this.fuelItem = fuelItem;
         this.fuel = fuel;
