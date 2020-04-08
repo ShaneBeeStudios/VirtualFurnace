@@ -53,6 +53,7 @@
                 <includes>
                     <include>plugin.yml</include>
                     <include>furnaces.yml</include>
+                    <include>tiles.yml</include>
                     <include>VirtualFurnace.properties</include>
                 </includes>
             </resource>
@@ -81,10 +82,12 @@
         </extensions>
     </build>
 
+    <!-- Distribution for maven repo -->
     <distributionManagement>
         <repository>
             <id>maven-ftp-repo</id>
             <url>ftp://maven.shanebeestudios.com</url>
         </repository>
     </distributionManagement>
+
 </project>
