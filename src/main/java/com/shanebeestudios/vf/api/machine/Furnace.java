@@ -173,6 +173,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
      *
      * @param player Player to open inventory to
      */
+    @Override
     public void openInventory(Player player) {
         updateInventory();
         player.openInventory(this.inventory);

@@ -3,10 +3,13 @@ package com.shanebeestudios.vf.api;
 import com.shanebeestudios.vf.api.machine.Furnace;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
 import com.shanebeestudios.vf.api.task.FurnaceTick;
+import com.shanebeestudios.vf.api.tile.FurnaceTile;
 import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -20,6 +23,7 @@ public class VirtualFurnaceAPI {
     static {
         ConfigurationSerialization.registerClass(Furnace.class, "furnace");
         ConfigurationSerialization.registerClass(FurnaceProperties.class, "furnace_properties");
+        ConfigurationSerialization.registerClass(FurnaceTile.class, "tile");
     }
 
     private boolean enabled = true;
@@ -28,6 +32,7 @@ public class VirtualFurnaceAPI {
     private final JavaPlugin plugin;
     private final RecipeManager recipeManager;
     private final FurnaceManager furnaceManager;
+    private final TileManager tileManager;
     private final FurnaceTick furnaceTick;
 
     /**
@@ -47,13 +52,14 @@ public class VirtualFurnaceAPI {
      * @param javaPlugin     Your plugin
      * @param disableMetrics Disable metrics for VirtualFurnaceAPI (If you are using metrics in your own plugin)
      */
-    public VirtualFurnaceAPI(JavaPlugin javaPlugin, boolean disableMetrics) {
+    public VirtualFurnaceAPI(@NotNull JavaPlugin javaPlugin, boolean disableMetrics) {
         instance = this;
         this.plugin = javaPlugin;
         this.apiVersion = getVersion();
         if (!Util.classExists("org.bukkit.persistence.PersistentDataHolder")) {
             this.recipeManager = null;
             this.furnaceManager = null;
+            this.tileManager = null;
             this.furnaceTick = null;
             Util.error("&cFailed to initialize VirtualFurnaceAPI");
             Util.error("&7  - Bukkit version: &b" + Bukkit.getBukkitVersion() + " &7is not supported!");
@@ -65,9 +71,21 @@ public class VirtualFurnaceAPI {
         }
         this.recipeManager = new RecipeManager();
         this.furnaceManager = new FurnaceManager(this);
+        this.tileManager = new TileManager(this);
         this.furnaceTick = new FurnaceTick(this);
         Bukkit.getPluginManager().registerEvents(new FurnaceListener(this), javaPlugin);
         Util.log("Initialized VirtualFurnaceAPI version: &b" + getVersion());
+    }
+
+    /**
+     * Disable the API
+     * <p>Stops ticking, saves all furnaces and tiles to file.
+     * This should be used in a plugin's {@link Plugin#onDisable() onDisable()} method</p>
+     */
+    public void disableAPI() {
+        this.furnaceTick.cancel();
+        this.furnaceManager.saveAll();
+        this.tileManager.saveAllTiles();
     }
 
     /**
@@ -113,6 +131,15 @@ public class VirtualFurnaceAPI {
      */
     public FurnaceManager getFurnaceManager() {
         return furnaceManager;
+    }
+
+    /**
+     * Get an instance of the tile manager
+     *
+     * @return Instance of the tile manager
+     */
+    public TileManager getTileManager() {
+        return tileManager;
     }
 
     /**

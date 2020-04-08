@@ -1,5 +1,8 @@
 package com.shanebeestudios.vf.api.machine;
 
+import com.shanebeestudios.vf.api.util.Util;
+import org.bukkit.entity.Player;
+
 import java.util.UUID;
 
 /**
@@ -8,8 +11,8 @@ import java.util.UUID;
  */
 public abstract class Machine {
 
-    private final UUID uniqueID;
     private final String name;
+    private final UUID uniqueID;
 
     Machine(UUID uniqueID, String name) {
         this.uniqueID = uniqueID;
@@ -40,11 +43,18 @@ public abstract class Machine {
     public void tick() {
     }
 
+    /**
+     * Open the inventory of this machine to a player
+     *
+     * @param player Player to open inventory to
+     */
+    public abstract void openInventory(Player player);
+
     @Override
     public String toString() {
         return "Machine{" +
-                "uniqueID=" + uniqueID +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
+                ", uniqueID=" + uniqueID +
                 '}';
     }
 
