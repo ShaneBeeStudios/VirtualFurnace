@@ -3,6 +3,7 @@ package com.shanebeestudios.vf.api;
 import com.shanebeestudios.vf.api.machine.Furnace;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
 import com.shanebeestudios.vf.api.task.FurnaceTick;
+import com.shanebeestudios.vf.api.task.TileTick;
 import com.shanebeestudios.vf.api.tile.FurnaceTile;
 import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Bukkit;
@@ -34,6 +35,7 @@ public class VirtualFurnaceAPI {
     private final FurnaceManager furnaceManager;
     private final TileManager tileManager;
     private final FurnaceTick furnaceTick;
+    private final TileTick tileTick;
 
     /**
      * Create a new instance of the VirtualFurnaceAPI
@@ -61,6 +63,7 @@ public class VirtualFurnaceAPI {
             this.furnaceManager = null;
             this.tileManager = null;
             this.furnaceTick = null;
+            this.tileTick = null;
             Util.error("&cFailed to initialize VirtualFurnaceAPI");
             Util.error("&7  - Bukkit version: &b" + Bukkit.getBukkitVersion() + " &7is not supported!");
             this.enabled = false;
@@ -73,6 +76,7 @@ public class VirtualFurnaceAPI {
         this.furnaceManager = new FurnaceManager(this);
         this.tileManager = new TileManager(this);
         this.furnaceTick = new FurnaceTick(this);
+        this.tileTick = new TileTick(this);
         Bukkit.getPluginManager().registerEvents(new FurnaceListener(this), javaPlugin);
         Util.log("Initialized VirtualFurnaceAPI version: &b" + getVersion());
     }
@@ -84,6 +88,7 @@ public class VirtualFurnaceAPI {
      */
     public void disableAPI() {
         this.furnaceTick.cancel();
+        this.tileTick.cancel();
         this.furnaceManager.saveAll();
         this.tileManager.saveAllTiles();
     }
