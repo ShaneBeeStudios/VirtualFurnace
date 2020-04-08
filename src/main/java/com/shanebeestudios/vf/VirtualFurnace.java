@@ -2,6 +2,7 @@ package com.shanebeestudios.vf;
 
 import com.shanebeestudios.vf.api.FurnaceManager;
 import com.shanebeestudios.vf.api.RecipeManager;
+import com.shanebeestudios.vf.api.TileManager;
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import com.shanebeestudios.vf.api.recipe.Fuel;
 import com.shanebeestudios.vf.api.recipe.FurnaceRecipe;
@@ -22,9 +23,10 @@ public class VirtualFurnace extends JavaPlugin {
     private VirtualFurnaceAPI virtualFurnaceAPI;
     private RecipeManager recipeManager;
     private FurnaceManager furnaceManager;
+    private TileManager tileManager;
     private FurnaceTick furnaceTick;
 
-    // If run as a Bukkit plugin, load the plugin
+    // If ran as a Bukkit plugin, load the plugin
     @Override
     public void onEnable() {
         instance = this;
@@ -39,6 +41,7 @@ public class VirtualFurnace extends JavaPlugin {
         }
         this.recipeManager = virtualFurnaceAPI.getRecipeManager();
         this.furnaceManager = virtualFurnaceAPI.getFurnaceManager();
+        this.tileManager = virtualFurnaceAPI.getTileManager();
         this.furnaceTick = virtualFurnaceAPI.getFurnaceTick();
 
         registerCommands();
@@ -53,13 +56,13 @@ public class VirtualFurnace extends JavaPlugin {
         if (!enabled) {
             return;
         }
+        this.furnaceTick.cancel();
         Util.log("Saving &b" + this.furnaceManager.getAllFurnaces().size() + " &7furnaces...");
         this.furnaceManager.saveAll();
         Util.log("Furnaces saved &asuccessfully!");
-        this.furnaceTick.cancel();
-        this.furnaceTick = null;
-        this.furnaceManager = null;
-        this.recipeManager = null;
+        Util.log("Saving &b" + this.tileManager.getAllTiles().size() + " &7tiles...");
+        this.tileManager.saveAllTiles();
+        Util.log("Tiles saved &asuccessfully!");
         this.virtualFurnaceAPI = null;
     }
 
