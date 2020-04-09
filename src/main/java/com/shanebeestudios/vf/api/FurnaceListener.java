@@ -67,8 +67,10 @@ class FurnaceListener implements Listener {
         VirtualChunk virtualChunk = tileManager.getChunk(chunk);
         if (virtualChunk != null) {
             if (load) {
+                if (virtualChunk.isLoaded()) return;
                 tileManager.loadChunk(virtualChunk);
             } else {
+                if (virtualChunk.isForceLoaded()) return;
                 tileManager.unloadChunk(virtualChunk);
             }
         }

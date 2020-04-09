@@ -19,12 +19,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Manager for {@link Tile Tiles}
+ * Manager for {@link Tile Tiles} and {@link VirtualChunk VirtualChunks}
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class TileManager {
@@ -123,31 +124,54 @@ public class TileManager {
     }
 
     /**
-     * Get all {@link VirtualChunk MachineChunks}
+     * Get all {@link VirtualChunk VirtualChunks}
      *
-     * @return Collection of all MachineChunks
+     * @return Collection of all VirtualChunks
      */
     public Collection<VirtualChunk> getChunks() {
-        return chunkMap.values();
+        return Collections.unmodifiableCollection(chunkMap.values());
     }
 
     /**
-     * Get all loaded {@link VirtualChunk MachineChunks}
+     * Get all loaded {@link VirtualChunk VirtualChunks}
      *
-     * @return Collection of all loaded MachineChunks
+     * @return Unmodifiable collection of all loaded VirtualChunks
      */
     public Collection<VirtualChunk> getLoadedChunks() {
-        return loadedChunks;
+        return Collections.unmodifiableCollection(loadedChunks);
     }
 
-    public void loadChunk(@NotNull VirtualChunk chunk) {
-        loadedChunks.add(chunk);
+    /**
+     * Load a chunk
+     *
+     * @param chunk Chunk to load
+     * @return True if chunk was loaded, false if it did not load
+     */
+    public boolean loadChunk(@NotNull VirtualChunk chunk) {
+        return loadedChunks.add(chunk);
     }
 
-    public void unloadChunk(@NotNull VirtualChunk chunk) {
-        loadedChunks.remove(chunk);
+    /**
+     * Unload a chunk
+     * <p>If the chunk has a ticket, it will not unload</p>
+     *
+     * @param chunk Chunk to unload
+     * @return True if unloaded, false if it did not unload
+     */
+    public boolean unloadChunk(@NotNull VirtualChunk chunk) {
+        if (loadedChunks.contains(chunk) && !chunk.isForceLoaded()) {
+            loadedChunks.remove(chunk);
+            return true;
+        }
+        return false;
     }
 
+    /**
+     * Check if a chunk is loaded
+     *
+     * @param chunk Chunk to check
+     * @return True if loaded, false if not loaded
+     */
     public boolean isChunkLoaded(@NotNull VirtualChunk chunk) {
         return loadedChunks.contains(chunk);
     }
@@ -157,7 +181,7 @@ public class TileManager {
      *
      * @param x X coordinate of Chunk
      * @param z Z coordinate of Chunk
-     * @return MachineChunk at coordinates
+     * @return VirtualChunk at coordinates
      */
     public VirtualChunk getChunk(int x, int z) {
         return chunkMap.get(new ChunkKey(x, z));
@@ -167,7 +191,7 @@ public class TileManager {
      * Get a {@link VirtualChunk} based on a {@link Chunk Bukkit Chunk}
      *
      * @param chunk Chunk to check
-     * @return MachineChunk relevant to Chunk
+     * @return VirtualChunk relevant to Chunk
      */
     public VirtualChunk getChunk(@NotNull Chunk chunk) {
         for (VirtualChunk mChunk : chunkMap.values()) {
