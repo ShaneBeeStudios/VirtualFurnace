@@ -1,7 +1,7 @@
 package com.shanebeestudios.vf.api.property;
 
 /**
- * Interface for a machine that holds properties
+ * Interface for a {@link com.shanebeestudios.vf.api.machine.Machine} that holds properties
  */
 @SuppressWarnings("unused")
 public interface PropertyHolder<P extends Properties> {
