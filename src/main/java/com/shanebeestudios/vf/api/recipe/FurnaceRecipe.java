@@ -2,21 +2,19 @@ package com.shanebeestudios.vf.api.recipe;
 
 import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Bukkit;
-import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.BlastingRecipe;
 import org.bukkit.inventory.SmokingRecipe;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Recipes for furnaces
+ * Recipes for {@link com.shanebeestudios.vf.api.machine.Furnace Furnaces}
  */
 @SuppressWarnings("unused")
-public class FurnaceRecipe implements Keyed {
+public class FurnaceRecipe extends Recipe {
 
     private static final boolean HAS_SMOKING = Util.isRunningMinecraft(1, 14);
     private static final List<FurnaceRecipe> VANILLA_FURNACE_RECIPES = new ArrayList<>();
@@ -72,34 +70,20 @@ public class FurnaceRecipe implements Keyed {
         return VANILLA_BLASTING_RECIPES;
     }
 
-    private final NamespacedKey key;
     private final Material ingredient;
-    private final Material result;
     private final int cookTime;
 
     /**
-     * Create a new recipe for a furnace
+     * Create a new recipe for a {@link com.shanebeestudios.vf.api.machine.Furnace}
      *
      * @param key        Key for recipe
      * @param ingredient Ingredient to be put into furnace
-     * @param result     Result after cooking
      * @param cookTime   Time to cook this item (in ticks)
      */
     public FurnaceRecipe(NamespacedKey key, Material ingredient, Material result, int cookTime) {
-        this.key = key;
+        super(key, result);
         this.ingredient = ingredient;
-        this.result = result;
         this.cookTime = cookTime;
-    }
-
-    /**
-     * Get the key from this recipe
-     *
-     * @return Key from recipe
-     */
-    @Override
-    public @NotNull NamespacedKey getKey() {
-        return this.key;
     }
 
     /**
@@ -109,15 +93,6 @@ public class FurnaceRecipe implements Keyed {
      */
     public Material getIngredient() {
         return this.ingredient;
-    }
-
-    /**
-     * Get the result of this recipe
-     *
-     * @return Result of this recipe
-     */
-    public Material getResult() {
-        return this.result;
     }
 
     /**
