@@ -1,7 +1,7 @@
 package com.shanebeestudios.vf.api;
 
 import com.shanebeestudios.vf.api.chunk.ChunkKey;
-import com.shanebeestudios.vf.api.chunk.MachineChunk;
+import com.shanebeestudios.vf.api.chunk.VirtualChunk;
 import com.shanebeestudios.vf.api.machine.Furnace;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
 import com.shanebeestudios.vf.api.tile.FurnaceTile;
@@ -29,8 +29,9 @@ import java.util.Map;
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class TileManager {
 
-    private final Map<ChunkKey, MachineChunk> chunkMap = new HashMap<>();
-    private final List<Tile<?>> tiles;
+    private final Map<ChunkKey, VirtualChunk> chunkMap = new HashMap<>();
+    private final List<VirtualChunk> loadedChunks = new ArrayList<>();
+    private final List<Tile<?>> tiles = new ArrayList<>();
 
     private final VirtualFurnaceAPI virtualFurnaceAPI;
     private File tileFile;
@@ -39,26 +40,8 @@ public class TileManager {
     public TileManager(VirtualFurnaceAPI virtualFurnaceAPI) {
         this.virtualFurnaceAPI = virtualFurnaceAPI;
         loadTileConfig();
-        tiles = loadTiles();
-        loadChunks(tiles);
-    }
-
-    private void loadChunks(List<Tile<?>> tiles) {
-        for (Tile<?> tile : tiles) {
-            int x = tile.getX() >> 4;
-            int z = tile.getZ() >> 4;
-            ChunkKey key = new ChunkKey(x, z);
-            if (!chunkMap.containsKey(key)) {
-                MachineChunk chunk = new MachineChunk(x, z, tile.getBukkitWorld());
-                if (tile.getBukkitWorld().isChunkLoaded(x, z)) {
-                    chunk.setLoaded(true);
-                }
-                chunk.addTile(tile);
-                chunkMap.put(key, chunk);
-            } else {
-                chunkMap.get(key).addTile(tile);
-            }
-        }
+        loadTiles();
+        loadChunks();
     }
 
     private void loadTileConfig() {
@@ -71,9 +54,8 @@ public class TileManager {
         this.tileConfig = YamlConfiguration.loadConfiguration(this.tileFile);
     }
 
-    private List<Tile<?>> loadTiles() {
+    private void loadTiles() {
         ConfigurationSection section = this.tileConfig.getConfigurationSection("tiles");
-        List<Tile<?>> tiles = new ArrayList<>();
         if (section != null) {
             for (String string : section.getKeys(true)) {
                 if (section.get(string) instanceof FurnaceTile) {
@@ -83,7 +65,25 @@ public class TileManager {
                 }
             }
         }
-        return tiles;
+    }
+
+    private void loadChunks() {
+        for (Tile<?> tile : tiles) {
+            int x = tile.getX() >> 4;
+            int z = tile.getZ() >> 4;
+            ChunkKey key = new ChunkKey(x, z);
+            VirtualChunk chunk;
+            if (!chunkMap.containsKey(key)) {
+                chunk = chunkMap.put(key, new VirtualChunk(x, z, tile.getBukkitWorld()));
+            } else {
+                chunk = chunkMap.get(key);
+            }
+            assert chunk != null;
+            chunk.addTile(tile);
+            if (tile.getBukkitWorld().isChunkLoaded(x, z)) {
+                loadedChunks.add(chunk);
+            }
+        }
     }
 
     /**
@@ -123,48 +123,54 @@ public class TileManager {
     }
 
     /**
-     * Get all {@link MachineChunk MachineChunks}
+     * Get all {@link VirtualChunk MachineChunks}
      *
      * @return Collection of all MachineChunks
      */
-    public Collection<MachineChunk> getChunks() {
+    public Collection<VirtualChunk> getChunks() {
         return chunkMap.values();
     }
 
     /**
-     * Get all loaded {@link MachineChunk MachineChunks}
+     * Get all loaded {@link VirtualChunk MachineChunks}
      *
      * @return Collection of all loaded MachineChunks
      */
-    public Collection<MachineChunk> getLoadedChunks() {
-        List<MachineChunk> loaded = new ArrayList<>();
-        for (MachineChunk chunk : getChunks()) {
-            if (chunk.isLoaded()) {
-                loaded.add(chunk);
-            }
-        }
-        return loaded;
+    public Collection<VirtualChunk> getLoadedChunks() {
+        return loadedChunks;
+    }
+
+    public void loadChunk(@NotNull VirtualChunk chunk) {
+        loadedChunks.add(chunk);
+    }
+
+    public void unloadChunk(@NotNull VirtualChunk chunk) {
+        loadedChunks.remove(chunk);
+    }
+
+    public boolean isChunkLoaded(@NotNull VirtualChunk chunk) {
+        return loadedChunks.contains(chunk);
     }
 
     /**
-     * Get a {@link MachineChunk} based on a {@link Chunk Bukkit Chunk's} coordinates
+     * Get a {@link VirtualChunk} based on a {@link Chunk Bukkit Chunk's} coordinates
      *
      * @param x X coordinate of Chunk
      * @param z Z coordinate of Chunk
      * @return MachineChunk at coordinates
      */
-    public MachineChunk getChunk(int x, int z) {
+    public VirtualChunk getChunk(int x, int z) {
         return chunkMap.get(new ChunkKey(x, z));
     }
 
     /**
-     * Get a {@link MachineChunk} based on a {@link Chunk Bukkit Chunk}
+     * Get a {@link VirtualChunk} based on a {@link Chunk Bukkit Chunk}
      *
      * @param chunk Chunk to check
      * @return MachineChunk relevant to Chunk
      */
-    public MachineChunk getChunk(@NotNull Chunk chunk) {
-        for (MachineChunk mChunk : chunkMap.values()) {
+    public VirtualChunk getChunk(@NotNull Chunk chunk) {
+        for (VirtualChunk mChunk : chunkMap.values()) {
             if (chunk.getX() == mChunk.getX() && chunk.getZ() == mChunk.getZ()) {
                 return mChunk;
             }
@@ -211,16 +217,16 @@ public class TileManager {
 
     /**
      * Remove a {@link Tile}
-     * <p>Will remove the tile from the {@link MachineChunk} and yaml file.</p>
+     * <p>Will remove the tile from the {@link VirtualChunk} and yaml file.</p>
      *
      * @param tile Tile to remove
      * @return True if Tile was successfully removed
      */
     public boolean removeTile(@NotNull Tile<?> tile) {
         ChunkKey key = new ChunkKey(tile.getX() >> 4, tile.getZ() >> 4);
-        MachineChunk machineChunk = chunkMap.get(key);
-        if (machineChunk != null) {
-            machineChunk.removeTile(tile);
+        VirtualChunk virtualChunk = chunkMap.get(key);
+        if (virtualChunk != null) {
+            virtualChunk.removeTile(tile);
             tiles.remove(tile);
             tileConfig.set("tiles." + tile.getString(), null);
             saveConfig();
@@ -246,13 +252,13 @@ public class TileManager {
         int chunkZ = z >> 4;
         ChunkKey key = new ChunkKey(chunkX, chunkZ);
         if (!chunkMap.containsKey(key)) {
-            chunkMap.put(key, new MachineChunk(chunkX, chunkZ, world));
+            chunkMap.put(key, new VirtualChunk(chunkX, chunkZ, world));
         }
-        MachineChunk machineChunk = chunkMap.get(key);
-        if (machineChunk.isBukkitChunkLoaded()) {
-            machineChunk.setLoaded(true);
+        VirtualChunk virtualChunk = chunkMap.get(key);
+        if (virtualChunk.isBukkitChunkLoaded()) {
+            loadedChunks.add(virtualChunk);
         }
-        machineChunk.addTile(tile);
+        virtualChunk.addTile(tile);
         return tile;
     }
 

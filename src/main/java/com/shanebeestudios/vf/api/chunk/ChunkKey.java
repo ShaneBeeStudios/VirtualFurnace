@@ -5,7 +5,7 @@ import org.bukkit.Chunk;
 import java.util.Objects;
 
 /**
- * Represents a key for storing {@link MachineChunk MachineChunks} in maps
+ * Represents a key for storing {@link VirtualChunk MachineChunks} in maps
  * <p>These keys store an X and Z coordinate.</p>
  */
 public class ChunkKey {

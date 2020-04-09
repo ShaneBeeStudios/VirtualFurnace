@@ -2,7 +2,7 @@ package com.shanebeestudios.vf.api.task;
 
 import com.shanebeestudios.vf.api.TileManager;
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
-import com.shanebeestudios.vf.api.chunk.MachineChunk;
+import com.shanebeestudios.vf.api.chunk.VirtualChunk;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class TileTick extends BukkitRunnable {
@@ -19,7 +19,7 @@ public class TileTick extends BukkitRunnable {
     @Override
     public void run() {
         try {
-            this.tileManager.getLoadedChunks().forEach(MachineChunk::tick);
+            this.tileManager.getLoadedChunks().forEach(VirtualChunk::tick);
         } catch (Exception ignore) {}
         tick++;
         if (tick >= 6000) {

@@ -1,5 +1,6 @@
 package com.shanebeestudios.vf.api.chunk;
 
+import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import com.shanebeestudios.vf.api.tile.Tile;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -16,19 +17,17 @@ import java.util.List;
  * <br>Tiles will only tick if the chunk is loaded.</p>
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public class MachineChunk {
+public class VirtualChunk {
 
     private final List<Tile<?>> tiles = new ArrayList<>();
     private final int x;
     private final int z;
     private final World world;
-    private boolean loaded;
 
-    public MachineChunk(int x, int z, World world) {
+    public VirtualChunk(int x, int z, World world) {
         this.x = x;
         this.z = z;
         this.world = world;
-        loaded = false;
     }
 
     /** Get the X coord of this chunk
@@ -52,8 +51,8 @@ public class MachineChunk {
         return world;
     }
 
-    /** Get the {@link Chunk Bukkit Chunk} which correlates to this MachineChunk
-     * @return Chunk that correlates to this MachineChunk
+    /** Get the {@link Chunk Bukkit Chunk} which correlates to this VirtualChunk
+     * @return Chunk that correlates to this VirtualChunk
      */
     public Chunk getBukkitChunk() {
         return world.getChunkAt(x, z);
@@ -109,7 +108,7 @@ public class MachineChunk {
      * @return True if loaded
      */
     public boolean isLoaded() {
-        return loaded;
+        return VirtualFurnaceAPI.getInstance().getTileManager().isChunkLoaded(this);
     }
 
     /** Check if the corresponding {@link Chunk Bukkit Chunk} is loaded
@@ -117,13 +116,6 @@ public class MachineChunk {
      */
     public boolean isBukkitChunkLoaded() {
         return world.isChunkLoaded(x, z);
-    }
-
-    /** Set whether or not this chunk is loaded
-     * @param loaded True to load, false to unload
-     */
-    public void setLoaded(boolean loaded) {
-        this.loaded = loaded;
     }
 
     /**
@@ -138,11 +130,10 @@ public class MachineChunk {
 
     @Override
     public String toString() {
-        return "MachineChunk{" +
+        return "VirtualChunk{" +
                 ", x=" + x +
                 ", z=" + z +
                 ", world=" + world +
-                ", loaded=" + loaded +
                 '}';
     }
 

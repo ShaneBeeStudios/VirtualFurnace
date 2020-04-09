@@ -1,6 +1,6 @@
 package com.shanebeestudios.vf.api;
 
-import com.shanebeestudios.vf.api.chunk.MachineChunk;
+import com.shanebeestudios.vf.api.chunk.VirtualChunk;
 import com.shanebeestudios.vf.api.machine.Furnace;
 import com.shanebeestudios.vf.api.tile.Tile;
 import org.bukkit.Chunk;
@@ -43,11 +43,12 @@ class FurnaceListener implements Listener {
 
         if (event.getHand() != EquipmentSlot.HAND) return; // TODO temp for debugging
         Chunk chunk = block.getChunk();
-        MachineChunk machineChunk = tileManager.getChunk(chunk);
-        if (machineChunk != null) {
-            Tile<?> tile = machineChunk.getTile(block);
+        VirtualChunk virtualChunk = tileManager.getChunk(chunk);
+        if (virtualChunk != null) {
+            Tile<?> tile = virtualChunk.getTile(block);
             if (tile != null) {
                 tile.activate(event.getPlayer());
+                event.setCancelled(true);
             }
         }
     }
@@ -63,9 +64,13 @@ class FurnaceListener implements Listener {
     }
 
     private void handleChunk(Chunk chunk, boolean load) {
-        MachineChunk machineChunk = tileManager.getChunk(chunk);
-        if (machineChunk != null) {
-            machineChunk.setLoaded(load);
+        VirtualChunk virtualChunk = tileManager.getChunk(chunk);
+        if (virtualChunk != null) {
+            if (load) {
+                tileManager.loadChunk(virtualChunk);
+            } else {
+                tileManager.unloadChunk(virtualChunk);
+            }
         }
     }
 

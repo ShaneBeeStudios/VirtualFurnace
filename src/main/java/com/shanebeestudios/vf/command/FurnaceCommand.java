@@ -2,10 +2,12 @@ package com.shanebeestudios.vf.command;
 
 import com.shanebeestudios.vf.api.FurnaceManager;
 import com.shanebeestudios.vf.VirtualFurnace;
+import com.shanebeestudios.vf.api.TileManager;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
 import com.shanebeestudios.vf.debug.Debug;
 import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,10 +23,12 @@ import java.util.UUID;
 public class FurnaceCommand implements CommandExecutor {
 
     private final FurnaceManager furnaceManager;
+    private final TileManager tileManager;
     private final Debug debug;
 
     public FurnaceCommand(VirtualFurnace plugin) {
         this.furnaceManager = plugin.getFurnaceManager();
+        this.tileManager = plugin.getVirtualFurnaceAPI().getTileManager();
         this.debug = new Debug(plugin);
     }
 
@@ -105,6 +109,11 @@ public class FurnaceCommand implements CommandExecutor {
                             player.sendMessage("This item has no ID!");
                         }
                         break;
+                    case "tile":
+                        Location loc = player.getTargetBlockExact(20).getLocation();
+                        tileManager.createFurnaceTile(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), player.getWorld(), "test-smoker", FurnaceProperties.SMOKER);
+                        player.sendMessage("Tile created");
+                        break;
                     case "debug":
                         if (args.length == 1) {
                             sender.sendMessage("How much ya wanna debug?");
@@ -115,8 +124,9 @@ public class FurnaceCommand implements CommandExecutor {
                             player.sendMessage("Debugger currently running... please wait!");
                             return true;
                         }
-                        sender.sendMessage("Debugging " + amount + " new furnaces!");
-                        debug.loadDebugFurnaces(amount, player);
+                        //sender.sendMessage("Debugging " + amount + " new furnaces!");
+                        //debug.loadDebugFurnaces(amount, player);
+                        debug.loadDebugTiles(amount);
                 }
             }
 

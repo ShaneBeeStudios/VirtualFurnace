@@ -1,8 +1,6 @@
 package com.shanebeestudios.vf.api.task;
 
-import com.shanebeestudios.vf.api.TileManager;
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
-import com.shanebeestudios.vf.api.chunk.MachineChunk;
 import org.bukkit.scheduler.BukkitRunnable;
 import com.shanebeestudios.vf.api.FurnaceManager;
 import com.shanebeestudios.vf.api.machine.Furnace;
