@@ -2,6 +2,7 @@ package com.shanebeestudios.vf.api;
 
 import com.shanebeestudios.vf.api.machine.Furnace;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
+import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
@@ -282,6 +283,7 @@ public class FurnaceManager {
                 this.furnaceMap.put(UUID.fromString(string), (Furnace) section.get(string));
             }
         }
+        Util.log("Loaded: &b" + this.furnaceMap.size() + "&7 furnaces");
     }
 
     /**
