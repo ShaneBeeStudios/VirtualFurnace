@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a chunk which holds <b>{@link Tile Tiles}</b>
@@ -215,11 +216,25 @@ public class VirtualChunk {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VirtualChunk chunk = (VirtualChunk) o;
+        return x == chunk.x && z == chunk.z && Objects.equals(tiles, chunk.tiles) &&
+                Objects.equals(tickets, chunk.tickets) && Objects.equals(world, chunk.world);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tiles, tickets, x, z, world);
+    }
+
+    @Override
     public String toString() {
         return "VirtualChunk{" +
                 ", x=" + x +
                 ", z=" + z +
-                ", world=" + world +
+                ", world=" + world.getName() +
                 '}';
     }
 

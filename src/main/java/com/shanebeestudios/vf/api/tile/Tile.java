@@ -9,6 +9,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /** A tile that connects a tickable {@link Machine} to a {@link Block}
  * @param <M> Type of machine connected to this tile
  */
@@ -160,6 +162,20 @@ public abstract class Tile<M extends Machine> {
         } else {
             breakTile();
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tile<?> tile = (Tile<?>) o;
+        return x == tile.x && y == tile.y && z == tile.z && Objects.equals(machine, tile.machine) &&
+                Objects.equals(world, tile.world) && Objects.equals(blockData, tile.blockData);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(machine, x, y, z, world, blockData);
     }
 
     /**

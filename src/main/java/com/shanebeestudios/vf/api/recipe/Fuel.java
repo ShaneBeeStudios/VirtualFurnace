@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Fuel for furnace
@@ -201,6 +202,20 @@ public class Fuel implements Keyed {
      */
     public int getBurnTime() {
         return this.burnTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Fuel fuel = (Fuel) o;
+        return burnTime == fuel.burnTime && Objects.equals(key, fuel.key) &&
+                material == fuel.material && Objects.equals(tag, fuel.tag);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key, material, tag, burnTime);
     }
 
     @SuppressWarnings("ConstantConditions")

@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Properties for {@link Furnace Furnaces}
@@ -98,6 +99,19 @@ public class FurnaceProperties extends Properties implements Keyed, Configuratio
     @Override
     public NamespacedKey getKey() {
         return this.key;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FurnaceProperties that = (FurnaceProperties) o;
+        return Double.compare(that.cookX, cookX) == 0 && Double.compare(that.fuelX, fuelX) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cookX, fuelX);
     }
 
     @Override

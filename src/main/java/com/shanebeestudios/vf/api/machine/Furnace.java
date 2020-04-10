@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -294,6 +295,23 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
             this.input = null;
         }
         updateInventory();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Furnace furnace = (Furnace) o;
+        return cookTime == furnace.cookTime && cookTimeTotal == furnace.cookTimeTotal &&
+                fuelTime == furnace.fuelTime && fuelTimeTotal == furnace.fuelTimeTotal &&
+                Objects.equals(furnaceProperties, furnace.furnaceProperties) && Objects.equals(recipeManager, furnace.recipeManager) &&
+                Objects.equals(fuel, furnace.fuel) && Objects.equals(input, furnace.input) &&
+                Objects.equals(output, furnace.output) && Objects.equals(inventory, furnace.inventory);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(furnaceProperties, recipeManager, fuel, input, output, cookTime, cookTimeTotal, fuelTime, fuelTimeTotal, inventory);
     }
 
     @Override

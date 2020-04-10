@@ -3,6 +3,7 @@ package com.shanebeestudios.vf.api.machine;
 import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -41,6 +42,19 @@ public abstract class Machine {
      * Tick this machine.
      */
     public void tick() {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Machine machine = (Machine) o;
+        return Objects.equals(name, machine.name) && Objects.equals(uniqueID, machine.uniqueID);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, uniqueID);
     }
 
     /**

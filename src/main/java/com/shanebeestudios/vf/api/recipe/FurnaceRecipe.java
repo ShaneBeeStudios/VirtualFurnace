@@ -9,6 +9,7 @@ import org.bukkit.inventory.SmokingRecipe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Recipes for {@link com.shanebeestudios.vf.api.machine.Furnace Furnaces}
@@ -102,6 +103,19 @@ public class FurnaceRecipe extends Recipe {
      */
     public int getCookTime() {
         return this.cookTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FurnaceRecipe that = (FurnaceRecipe) o;
+        return cookTime == that.cookTime && ingredient == that.ingredient;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ingredient, cookTime);
     }
 
     @Override
