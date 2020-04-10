@@ -274,13 +274,14 @@ public class FurnaceManager {
         loadFurnaces();
     }
 
-    private void loadFurnaces() {
+    void loadFurnaces() {
         ConfigurationSection section = this.furnaceConfig.getConfigurationSection("furnaces");
-        if (section == null) return;
-        for (String string : section.getKeys(true)) {
-            if (section.get(string) instanceof Furnace) {
-                Furnace furnace = ((Furnace) section.get(string));
-                this.furnaceMap.put(UUID.fromString(string), (Furnace) section.get(string));
+        if (section != null) {
+            for (String string : section.getKeys(true)) {
+                if (section.get(string) instanceof Furnace) {
+                    Furnace furnace = ((Furnace) section.get(string));
+                    this.furnaceMap.put(UUID.fromString(string), (Furnace) section.get(string));
+                }
             }
         }
         Util.log("Loaded: &b" + this.furnaceMap.size() + "&7 furnaces");
@@ -335,6 +336,11 @@ public class FurnaceManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    void shutdown() {
+        saveAll();
+        furnaceMap.clear();
     }
 
 }

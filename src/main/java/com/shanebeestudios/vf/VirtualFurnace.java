@@ -24,7 +24,6 @@ public class VirtualFurnace extends JavaPlugin {
     private RecipeManager recipeManager;
     private FurnaceManager furnaceManager;
     private TileManager tileManager;
-    private FurnaceTick furnaceTick;
 
     // If ran as a Bukkit plugin, load the plugin
     @Override
@@ -42,7 +41,6 @@ public class VirtualFurnace extends JavaPlugin {
         this.recipeManager = virtualFurnaceAPI.getRecipeManager();
         this.furnaceManager = virtualFurnaceAPI.getFurnaceManager();
         this.tileManager = virtualFurnaceAPI.getTileManager();
-        this.furnaceTick = virtualFurnaceAPI.getFurnaceTick();
 
         registerCommands();
         registerRecipes();
@@ -53,9 +51,18 @@ public class VirtualFurnace extends JavaPlugin {
     @Override
     public void onDisable() {
         instance = null;
+        /*
         if (!enabled) {
             return;
         }
+         */
+        this.tileManager = null;
+        this.furnaceManager = null;
+        this.recipeManager = null;
+        this.virtualFurnaceAPI.disableAPI();
+        this.virtualFurnaceAPI = null;
+        Bukkit.getScheduler().cancelTasks(this);
+        /*
         this.furnaceTick.cancel();
         Util.log("Saving &b" + this.furnaceManager.getAllFurnaces().size() + " &7furnaces...");
         this.furnaceManager.saveAll();
@@ -63,7 +70,7 @@ public class VirtualFurnace extends JavaPlugin {
         Util.log("Saving &b" + this.tileManager.getAllTiles().size() + " &7tiles...");
         this.tileManager.saveAllTiles();
         Util.log("Tiles saved &asuccessfully!");
-        this.virtualFurnaceAPI = null;
+         */
     }
 
     @SuppressWarnings("ConstantConditions")

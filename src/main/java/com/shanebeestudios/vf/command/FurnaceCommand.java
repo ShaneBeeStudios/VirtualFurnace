@@ -127,6 +127,17 @@ public class FurnaceCommand implements CommandExecutor {
                         //sender.sendMessage("Debugging " + amount + " new furnaces!");
                         //debug.loadDebugFurnaces(amount, player);
                         debug.loadDebugTiles(amount);
+                        break;
+                    case "check":
+                        int furnaces = furnaceManager.getAllFurnaces().size();
+                        int tiles = tileManager.getAllTiles().size();
+                        int chunks = tileManager.getChunks().size();
+                        int loadedChunks = tileManager.getLoadedChunks().size();
+                        Util.log("&dCheck:");
+                        Util.log(" - Chunks: &b" + loadedChunks + "/" + chunks);
+                        Util.log(" - Tiles: &a" + tiles);
+                        Util.log(" - Furnaces: &c" + furnaces);
+
                 }
             }
 

@@ -40,6 +40,9 @@ public class TileManager {
 
     public TileManager(VirtualFurnaceAPI virtualFurnaceAPI) {
         this.virtualFurnaceAPI = virtualFurnaceAPI;
+    }
+
+    public void load() {
         loadTileConfig();
         loadTiles();
         loadChunks();
@@ -66,6 +69,7 @@ public class TileManager {
                 }
             }
         }
+        Util.log("Loaded: &b" + tiles.size() + "&7 tiles");
     }
 
     private void loadChunks() {
@@ -75,16 +79,15 @@ public class TileManager {
             ChunkKey key = new ChunkKey(x, z);
             VirtualChunk chunk;
             if (!chunkMap.containsKey(key)) {
-                chunk = chunkMap.put(key, new VirtualChunk(x, z, tile.getBukkitWorld()));
-            } else {
-                chunk = chunkMap.get(key);
+                chunkMap.put(key, new VirtualChunk(x, z, tile.getBukkitWorld()));
             }
-            assert chunk != null;
+            chunk = chunkMap.get(key);
             chunk.addTile(tile);
             if (tile.getBukkitWorld().isChunkLoaded(x, z)) {
                 loadedChunks.add(chunk);
             }
         }
+        Util.log("Loaded: &b" + loadedChunks.size() + "&7/&b" + chunkMap.values().size() + "&7 virtual chunks");
     }
 
     /**
@@ -121,6 +124,13 @@ public class TileManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    void shutdown() {
+        saveAllTiles();
+        chunkMap.clear();
+        loadedChunks.clear();
+        tiles.clear();
     }
 
     /**

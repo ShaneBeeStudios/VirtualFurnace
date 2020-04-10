@@ -31,11 +31,11 @@ public class VirtualFurnaceAPI {
     private static VirtualFurnaceAPI instance;
     private final String apiVersion;
     private final JavaPlugin plugin;
-    private final RecipeManager recipeManager;
-    private final FurnaceManager furnaceManager;
-    private final TileManager tileManager;
-    private final FurnaceTick furnaceTick;
-    private final TileTick tileTick;
+    private RecipeManager recipeManager;
+    private FurnaceManager furnaceManager;
+    private TileManager tileManager;
+    private FurnaceTick furnaceTick;
+    private TileTick tileTick;
 
     /**
      * Create a new instance of the VirtualFurnaceAPI
@@ -75,8 +75,11 @@ public class VirtualFurnaceAPI {
         this.recipeManager = new RecipeManager();
         this.furnaceManager = new FurnaceManager(this);
         this.tileManager = new TileManager(this);
+        this.tileManager.load();
         this.furnaceTick = new FurnaceTick(this);
+        this.furnaceTick.start();
         this.tileTick = new TileTick(this);
+        this.tileTick.start();
         Bukkit.getPluginManager().registerEvents(new FurnaceListener(this), javaPlugin);
         Util.log("Initialized VirtualFurnaceAPI version: &b" + getVersion());
     }
@@ -89,8 +92,14 @@ public class VirtualFurnaceAPI {
     public void disableAPI() {
         this.furnaceTick.cancel();
         this.tileTick.cancel();
-        this.furnaceManager.saveAll();
-        this.tileManager.saveAllTiles();
+        this.furnaceTick = null;
+        this.tileTick = null;
+        this.furnaceManager.shutdown();
+        this.tileManager.shutdown();
+        this.furnaceManager = null;
+        this.tileManager = null;
+        this.recipeManager = null;
+        Util.log("Shut down API!");
     }
 
     /**

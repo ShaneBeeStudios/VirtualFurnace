@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Properties for furnaces
+ * Properties for {@link Furnace Furnaces}
  * <p>Used to manipulate the speed properties of a furnace</p>
  */
 @SuppressWarnings({"unused", "SameParameterValue"})
