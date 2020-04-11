@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 public class ItemBuilder {
 
-    ItemStack itemStack;
+    final ItemStack itemStack;
     final ItemMeta itemMeta;
 
     /**

@@ -40,7 +40,7 @@ public class PotionItemBuilder extends ItemBuilder {
     public PotionItemBuilder(@NotNull Material material) {
         super(material);
         if (isNotPotion(material)) {
-            super.itemStack = new ItemStack(Material.POTION, 1);
+            super.itemStack.setType(Material.POTION);
         }
     }
 
@@ -54,7 +54,7 @@ public class PotionItemBuilder extends ItemBuilder {
     public PotionItemBuilder(@NotNull Material material, int amount) {
         super(material, amount);
         if (isNotPotion(material)) {
-            super.itemStack = new ItemStack(Material.POTION, amount);
+            super.itemStack.setType(Material.POTION);
         }
     }
 
@@ -69,7 +69,7 @@ public class PotionItemBuilder extends ItemBuilder {
     public PotionItemBuilder(@NotNull Material material, @NotNull Consumer<ItemMeta> meta) {
         super(material, meta);
         if (isNotPotion(material)) {
-            super.itemStack = new ItemStack(Material.POTION);
+            super.itemStack.setType(Material.POTION);
         }
     }
 
@@ -85,7 +85,7 @@ public class PotionItemBuilder extends ItemBuilder {
     public PotionItemBuilder(@NotNull Material material, int amount, @NotNull Consumer<ItemMeta> meta) {
         super(material, amount, meta);
         if (isNotPotion(material)) {
-            super.itemStack = new ItemStack(Material.POTION, 1);
+            super.itemStack.setType(Material.POTION);
         }
     }
 
