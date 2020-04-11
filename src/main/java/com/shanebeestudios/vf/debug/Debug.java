@@ -64,11 +64,10 @@ public class Debug {
                         FurnaceTile furnaceTile = tileManager.createFurnaceTile(x << 4, 1, z << 4, world, furnace);
                         VirtualChunk virtualChunk = tileManager.getChunk(furnaceTile.getBlock().getChunk());
                         tileManager.loadChunk(virtualChunk);
+                        virtualChunk.addPluginChunkTicket(plugin);
                     }
                 }
-                for (VirtualChunk chunk : tileManager.getChunks()) {
-                    tileManager.loadChunk(chunk);
-                }
+
                 Util.log("Chunks: &b" + tileManager.getChunks().size() + "&7 Loaded: &b" + tileManager.getLoadedChunks().size());
             }
         };
