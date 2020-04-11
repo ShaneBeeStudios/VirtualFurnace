@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Recipe manager for furnaces
+ * Recipe manager for {@link com.shanebeestudios.vf.api.machine.Furnace Furnaces}
  * <p>You can get an instance of this class from <b>{@link VirtualFurnaceAPI#getRecipeManager()}</b></p>
  */
 @SuppressWarnings({"UnusedReturnValue", "unused"})
