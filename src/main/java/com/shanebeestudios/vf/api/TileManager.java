@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Manager for {@link Tile Tiles} and {@link VirtualChunk VirtualChunks}
@@ -273,17 +274,148 @@ public class TileManager {
         return false;
     }
 
+    /**
+     * Create a new FurnaceTile attached to a block
+     * <p><b>NOTE:</b> DO NOT use <b>{@link FurnaceManager#createFurnace(String)}</b> methods in this part,
+     * instead create a new <b>{@link Furnace}</b> object to prevent double ticking/saving.</p>
+     *
+     * @param block   Block to create new FurnaceTile at
+     * @param furnace Furnace to add to this tile
+     * @return Instance of the new FurnaceTile
+     */
+    public FurnaceTile createFurnaceTile(@NotNull Block block, @NotNull Furnace furnace) {
+        return createFurnaceTile(block.getX(), block.getY(), block.getZ(), block.getWorld(), furnace, null, null);
+    }
+
+    /**
+     * Create a new FurnaceTile attached to a block
+     * <p><b>NOTE:</b> DO NOT use <b>{@link FurnaceManager#createFurnace(String)}</b> methods in this part,
+     * instead create a new <b>{@link Furnace}</b> object to prevent double ticking/saving.</p>
+     *
+     * @param block               Block to create new FurnaceTile at
+     * @param furnace             Furnace to add to this tile
+     * @param furnaceTileConsumer Consumer to manipulate this tile
+     * @return Instance of the new FurnaceTile
+     */
+    public FurnaceTile createFurnaceTile(@NotNull Block block, @NotNull Furnace furnace, @NotNull Consumer<FurnaceTile> furnaceTileConsumer) {
+        return createFurnaceTile(block.getX(), block.getY(), block.getZ(), block.getWorld(), furnace, null, furnaceTileConsumer);
+    }
+
+    /**
+     * Create a new FurnaceTile attached to a block
+     *
+     * @param block      Block to create new FurnaceTile at
+     * @param name       Name of new Furnace
+     * @param properties Properties of new Furnace
+     * @return Instance of the new FurnaceTile
+     */
+    public FurnaceTile createFurnaceTile(@NotNull Block block, @NotNull String name, @NotNull FurnaceProperties properties) {
+        Furnace furnace = new Furnace(name, properties);
+        return createFurnaceTile(block.getX(), block.getY(), block.getZ(), block.getWorld(), furnace, null, null);
+    }
+
+    /**
+     * Create a new FurnaceTile attached to a block
+     *
+     * @param block               Block to create new FurnaceTile at
+     * @param name                Name of new Furnace
+     * @param properties          Properties of new Furnace
+     * @param furnaceTileConsumer Consumer to manipulate this tile
+     * @return Instance of the new FurnaceTile
+     */
+    public FurnaceTile createFurnaceTile(@NotNull Block block, @NotNull String name, @NotNull FurnaceProperties properties, @NotNull Consumer<FurnaceTile> furnaceTileConsumer) {
+        Furnace furnace = new Furnace(name, properties);
+        return createFurnaceTile(block.getX(), block.getY(), block.getZ(), block.getWorld(), furnace, null, furnaceTileConsumer);
+    }
+
+    /**
+     * Create a new FurnaceTile attached to a block
+     *
+     * @param x          X location of block
+     * @param y          Y location of block
+     * @param z          Z location of block
+     * @param world      World of block
+     * @param name       Name of new Furnace
+     * @param properties Properties for new Furnace
+     * @return Instance of the new FurnaceTile
+     */
     public FurnaceTile createFurnaceTile(int x, int y, int z, @NotNull World world, @NotNull String name, @NotNull FurnaceProperties properties) {
         Furnace furnace = new Furnace(name, properties);
-        return createFurnaceTile(x, y, z, world, furnace);
+        return createFurnaceTile(x, y, z, world, furnace, null, null);
     }
 
-    public FurnaceTile createFurnaceTile(@NotNull Block block, @NotNull Furnace furnace) {
-        return createFurnaceTile(block.getX(), block.getY(), block.getZ(), block.getWorld(), furnace);
+    /**
+     * Create a new FurnaceTile attached to a block
+     *
+     * @param x               X location of block
+     * @param y               Y location of block
+     * @param z               Z location of block
+     * @param world           World of block
+     * @param name            Name of new Furnace
+     * @param properties      Properties for new Furnace
+     * @param furnaceConsumer Consumer to manipulate this furnace
+     * @return Instance of the new FurnaceTile
+     */
+    public FurnaceTile createFurnaceTile(int x, int y, int z, @NotNull World world, @NotNull String name, @NotNull FurnaceProperties properties, @NotNull Consumer<Furnace> furnaceConsumer) {
+        Furnace furnace = new Furnace(name, properties);
+        return createFurnaceTile(x, y, z, world, furnace, furnaceConsumer, null);
     }
 
+    /**
+     * Create a new FurnaceTile attached to a block
+     * <p><b>NOTE:</b> DO NOT use <b>{@link FurnaceManager#createFurnace(String)}</b> methods in this part,
+     * instead create a new <b>{@link Furnace}</b> object to prevent double ticking/saving.</p>
+     *
+     * @param x       X location of block
+     * @param y       Y location of block
+     * @param z       Z location of block
+     * @param world   World of block
+     * @param furnace Furnace to add to this tile
+     * @return Instance of the new FurnaceTile
+     */
     public FurnaceTile createFurnaceTile(int x, int y, int z, @NotNull World world, @NotNull Furnace furnace) {
+        return createFurnaceTile(x, y, z, world, furnace, null, null);
+    }
+
+    /**
+     * Create a new FurnaceTile attached to a block
+     * <p><b>NOTE:</b> DO NOT use <b>{@link FurnaceManager#createFurnace(String)}</b> methods in this part,
+     * instead create a new <b>{@link Furnace}</b> object to prevent double ticking/saving.</p>
+     *
+     * @param x               X location of block
+     * @param y               Y location of block
+     * @param z               Z location of block
+     * @param world           World of block
+     * @param furnace         Furnace to add to this tile
+     * @param furnaceConsumer Consumer to manipulate this furnace
+     * @return Instance of the new FurnaceTile
+     */
+    public FurnaceTile createFurnaceTile(int x, int y, int z, @NotNull World world, @NotNull Furnace furnace, @NotNull Consumer<Furnace> furnaceConsumer) {
+        return createFurnaceTile(x, y, z, world, furnace, furnaceConsumer, null);
+    }
+
+    /**
+     * Create a new FurnaceTile attached to a block
+     * <p><b>NOTE:</b> DO NOT use <b>{@link FurnaceManager#createFurnace(String)}</b> methods in this part,
+     * instead create a new <b>{@link Furnace}</b> object to prevent double ticking/saving.</p>
+     *
+     * @param x                   X location of block
+     * @param y                   Y location of block
+     * @param z                   Z location of block
+     * @param world               World of block
+     * @param furnace             Furnace to add to this tile
+     * @param furnaceConsumer     Consumer to manipulate this furnace
+     * @param furnaceTileConsumer Consumer to manipulate this tile
+     * @return Instance of the new FurnaceTile
+     */
+    public FurnaceTile createFurnaceTile(int x, int y, int z, @NotNull World world, @NotNull Furnace furnace, Consumer<Furnace> furnaceConsumer, Consumer<FurnaceTile> furnaceTileConsumer) {
+        if (furnaceConsumer != null) {
+            furnaceConsumer.accept(furnace);
+        }
         FurnaceTile tile = new FurnaceTile(furnace, x, y, z, world);
+        if (furnaceTileConsumer != null) {
+            furnaceTileConsumer.accept(tile);
+        }
         tiles.add(tile);
         saveTile(tile, true);
         int chunkX = x >> 4;
