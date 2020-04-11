@@ -26,7 +26,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * Manager for furnaces
+ * Manager for {@link Furnace Furnaces}
  * <p>You can get an instance of this class from <b>{@link VirtualFurnaceAPI#getFurnaceManager()}</b></p>
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
