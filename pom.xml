@@ -6,7 +6,7 @@
 
     <groupId>com.shanebeestudios</groupId>
     <artifactId>VirtualFurnace</artifactId>
-    <version>1.0.0-Beta5</version>
+    <version>1.0.0-Beta6</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -86,6 +86,7 @@
     <distributionManagement>
         <repository>
             <id>maven-ftp-repo</id>
+            <name>VirtualFurnaceAPI Repo</name>
             <url>ftp://maven.shanebeestudios.com</url>
         </repository>
     </distributionManagement>
