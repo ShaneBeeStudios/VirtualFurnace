@@ -2,10 +2,12 @@ package com.shanebeestudios.vf.api.chunk;
 
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import com.shanebeestudios.vf.api.tile.Tile;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -25,7 +27,7 @@ import java.util.Objects;
 public class VirtualChunk {
 
     private final List<Tile<?>> tiles = new ArrayList<>();
-    private final List<Plugin> tickets = new ArrayList<>();
+    private final List<String> tickets = new ArrayList<>();
     private final int x;
     private final int z;
     private final World world;
@@ -152,7 +154,15 @@ public class VirtualChunk {
      * @return Unmodifiable collection containing which plugins have tickets for this chunk
      */
     public Collection<Plugin> getPluginChunkTickets() {
-        return Collections.unmodifiableCollection(tickets);
+        PluginManager pluginManager = Bukkit.getPluginManager();
+        List<Plugin> plugins = new ArrayList<>();
+        for (String ticket : tickets) {
+            Plugin plugin = pluginManager.getPlugin(ticket);
+            if (plugin != null) {
+                plugins.add(plugin);
+            }
+        }
+        return Collections.unmodifiableCollection(plugins);
     }
 
     /**
@@ -165,8 +175,9 @@ public class VirtualChunk {
      * @return true if a plugin ticket was added, false if the ticket already exists for the plugin
      */
     public boolean addPluginChunkTicket(@NotNull Plugin plugin) {
-        if (!tickets.contains(plugin)) {
-            tickets.add(plugin);
+        String p = plugin.getDescription().getName();
+        if (!tickets.contains(p)) {
+            tickets.add(p);
             if (!isLoaded()) {
                 VirtualFurnaceAPI.getInstance().getTileManager().loadChunk(this);
             }
@@ -185,14 +196,25 @@ public class VirtualChunk {
      * @return true if the plugin ticket was removed, false if there is no plugin ticket for the chunk
      */
     public boolean removePluginChunkTicket(@NotNull Plugin plugin) {
-        if (tickets.contains(plugin)) {
-            tickets.remove(plugin);
+        String p = plugin.getDescription().getName();
+        if (tickets.contains(p)) {
+            tickets.remove(p);
             if (tickets.isEmpty()) {
                 VirtualFurnaceAPI.getInstance().getTileManager().unloadChunk(this);
             }
             return true;
         }
         return false;
+    }
+
+    /**
+     * Remove all plugin chunk tickets
+     * <p>This is generally used internally and should not
+     * be used by plugins.</p>
+     */
+    public void removeAllPluginChunkTickets() {
+        tickets.clear();
+        VirtualFurnaceAPI.getInstance().getTileManager().unloadChunk(this);
     }
 
     /**
