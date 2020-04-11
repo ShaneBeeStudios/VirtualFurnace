@@ -128,8 +128,12 @@ public class TileManager {
 
     void shutdown() {
         saveAllTiles();
-        chunkMap.clear();
+        List<VirtualChunk> chunks = new ArrayList<>(loadedChunks);
+        for (VirtualChunk chunk : chunks) {
+            chunk.removeAllPluginChunkTickets();
+        }
         loadedChunks.clear();
+        chunkMap.clear();
         tiles.clear();
     }
 
@@ -242,7 +246,7 @@ public class TileManager {
      */
     public Tile<?> getTile(int x, int y, int z, @NotNull World world) {
         for (Tile<?> tile : tiles) {
-            if (tile.getX() == z && tile.getY() == y && tile.getZ() == z && tile.getBukkitWorld() == world) {
+            if (tile.getX() == x && tile.getY() == y && tile.getZ() == z && tile.getBukkitWorld() == world) {
                 return tile;
             }
         }
