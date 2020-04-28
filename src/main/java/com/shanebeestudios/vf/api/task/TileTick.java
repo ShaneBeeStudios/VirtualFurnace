@@ -3,8 +3,6 @@ package com.shanebeestudios.vf.api.task;
 import com.shanebeestudios.vf.api.TileManager;
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import com.shanebeestudios.vf.api.chunk.VirtualChunk;
-import com.shanebeestudios.vf.api.tile.Tile;
-import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -14,7 +12,6 @@ public class TileTick extends BukkitRunnable {
     private final VirtualFurnaceAPI virtualFurnaceAPI;
     private final TileManager tileManager;
     private int tick;
-    private BukkitTask task;
     private int id;
     private boolean running;
 
@@ -25,7 +22,7 @@ public class TileTick extends BukkitRunnable {
     }
 
     public void start() {
-        task = this.runTaskTimerAsynchronously(virtualFurnaceAPI.getJavaPlugin(), 20, 1);
+        BukkitTask task = this.runTaskTimerAsynchronously(virtualFurnaceAPI.getJavaPlugin(), 20, 1);
         id = task.getTaskId();
     }
 
@@ -39,7 +36,8 @@ public class TileTick extends BukkitRunnable {
                 }
                 chunk.tick();
             }
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
         tick++;
         if (tick >= 6000) {
             this.tileManager.saveAllTiles();
@@ -52,7 +50,6 @@ public class TileTick extends BukkitRunnable {
     public synchronized void cancel() throws IllegalStateException {
         this.running = false;
         Bukkit.getScheduler().cancelTask(id);
-        Util.log("Cancelling TileTick with id: " + id);
     }
 
 }
