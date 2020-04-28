@@ -33,7 +33,6 @@ public class FurnaceTick extends BukkitRunnable {
     public void run() {
         running = true;
         try {
-            this.furnaceManager.getAllFurnaces().forEach(Furnace::tick);
             for (Furnace furnace : furnaceManager.getAllFurnaces()) {
                 if (!running) {
                     return;
