@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -40,19 +41,24 @@ public class FurnaceTile extends Tile<Furnace> implements ConfigurationSerializa
             final ItemStack fuel = machine.getFuel();
             final ItemStack input = machine.getInput();
             final ItemStack output = machine.getOutput();
+            final float xp = machine.extractExperience();
+            final Vector vec = new Vector(0, 0, 0);
 
             @Override
             public void run() {
                 World world = getBukkitWorld();
                 Location drop = new Location(world, x + 0.5, y + 0.5, z + 0.5);
                 if (fuel != null) {
-                    world.dropItem(drop, fuel).setVelocity(new Vector(0, 0, 0));
+                    world.dropItem(drop, fuel).setVelocity(vec);
                 }
                 if (input != null) {
-                    world.dropItem(drop, input).setVelocity(new Vector(0, 0, 0));
+                    world.dropItem(drop, input).setVelocity(vec);
                 }
                 if (output != null) {
-                    world.dropItem(drop, output).setVelocity(new Vector(0, 0, 0));
+                    world.dropItem(drop, output).setVelocity(vec);
+                }
+                if (xp > 0) {
+                    world.spawn(drop, ExperienceOrb.class, orb -> orb.setExperience((int) xp)).setVelocity(vec);
                 }
             }
         };

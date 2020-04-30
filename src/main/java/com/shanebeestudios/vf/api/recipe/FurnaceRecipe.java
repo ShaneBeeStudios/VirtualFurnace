@@ -26,16 +26,16 @@ public class FurnaceRecipe extends Recipe {
         Bukkit.recipeIterator().forEachRemaining(recipe -> {
             if (recipe instanceof org.bukkit.inventory.FurnaceRecipe) {
                 org.bukkit.inventory.FurnaceRecipe r = ((org.bukkit.inventory.FurnaceRecipe) recipe);
-                FurnaceRecipe rec = new FurnaceRecipe(Util.getKey("mc_furnace_" + r.getKey().getKey()), r.getInput().getType(), r.getResult().getType(), r.getCookingTime());
+                FurnaceRecipe rec = new FurnaceRecipe(Util.getKey("mc_furnace_" + r.getKey().getKey()), r.getInput().getType(), r.getResult().getType(), r.getCookingTime(), r.getExperience());
                 VANILLA_FURNACE_RECIPES.add(rec);
             } else if (HAS_SMOKING) {
                 if (recipe instanceof SmokingRecipe) {
                     SmokingRecipe r = ((SmokingRecipe) recipe);
-                    FurnaceRecipe rec = new FurnaceRecipe(Util.getKey("mc_smoking_" + r.getKey().getKey()), r.getInput().getType(), r.getResult().getType(), r.getCookingTime());
+                    FurnaceRecipe rec = new FurnaceRecipe(Util.getKey("mc_smoking_" + r.getKey().getKey()), r.getInput().getType(), r.getResult().getType(), r.getCookingTime(), r.getExperience());
                     VANILLA_SMOKING_RECIPES.add(rec);
                 } else if (recipe instanceof BlastingRecipe) {
                     BlastingRecipe r = ((BlastingRecipe) recipe);
-                    FurnaceRecipe rec = new FurnaceRecipe(Util.getKey("mc_blasting_" + r.getKey().getKey()), r.getInput().getType(), r.getResult().getType(), r.getCookingTime());
+                    FurnaceRecipe rec = new FurnaceRecipe(Util.getKey("mc_blasting_" + r.getKey().getKey()), r.getInput().getType(), r.getResult().getType(), r.getCookingTime(), r.getExperience());
                     VANILLA_BLASTING_RECIPES.add(rec);
                 }
             }
@@ -73,18 +73,35 @@ public class FurnaceRecipe extends Recipe {
 
     private final Material ingredient;
     private final int cookTime;
+    private final float experience;
+
+    /**
+     * Create a new recipe for a {@link com.shanebeestudios.vf.api.machine.Furnace}
+     * <p>The experience for this will default to 0.0</p>
+     *
+     * @param key        Key for recipe
+     * @param ingredient Ingredient to be put into furnace
+     * @param result     The resulting item from this recipe
+     * @param cookTime   Time to cook this item (in ticks)
+     */
+    public FurnaceRecipe(NamespacedKey key, Material ingredient, Material result, int cookTime) {
+        this(key, ingredient, result, cookTime, 0.0F);
+    }
 
     /**
      * Create a new recipe for a {@link com.shanebeestudios.vf.api.machine.Furnace}
      *
      * @param key        Key for recipe
      * @param ingredient Ingredient to be put into furnace
+     * @param result     The resulting item from this recipe
      * @param cookTime   Time to cook this item (in ticks)
+     * @param experience The experience the player will receive for cooking this item
      */
-    public FurnaceRecipe(NamespacedKey key, Material ingredient, Material result, int cookTime) {
+    public FurnaceRecipe(NamespacedKey key, Material ingredient, Material result, int cookTime, float experience) {
         super(key, result);
         this.ingredient = ingredient;
         this.cookTime = cookTime;
+        this.experience = experience;
     }
 
     /**
@@ -105,17 +122,26 @@ public class FurnaceRecipe extends Recipe {
         return this.cookTime;
     }
 
+    /**
+     * Get the experience this recipe will yield
+     *
+     * @return Experience this recipe will yield
+     */
+    public float getExperience() {
+        return experience;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FurnaceRecipe that = (FurnaceRecipe) o;
-        return cookTime == that.cookTime && ingredient == that.ingredient;
+        FurnaceRecipe recipe = (FurnaceRecipe) o;
+        return cookTime == recipe.cookTime && Float.compare(recipe.experience, experience) == 0 && ingredient == recipe.ingredient;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ingredient, cookTime);
+        return Objects.hash(ingredient, cookTime, experience);
     }
 
     @Override
@@ -125,6 +151,7 @@ public class FurnaceRecipe extends Recipe {
                 ", ingredient=" + ingredient +
                 ", result=" + result +
                 ", cookTime=" + cookTime +
+                ", experience=" + experience +
                 '}';
     }
 

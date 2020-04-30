@@ -41,6 +41,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
     private int fuelTime;
     private int fuelTimeTotal;
     private final Inventory inventory;
+    private float experience;
 
     /**
      * Create a new furnace object
@@ -59,7 +60,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
      * <p><b>NOTE:</b> Creating a furnace object using this method will not tick the furnace.</p>
      * <p>It is recommended to use <b>{@link com.shanebeestudios.vf.api.FurnaceManager#createFurnace(String)}</b></p>
      *
-     * @param name       Name of the object which will show up in the UI
+     * @param name              Name of the object which will show up in the UI
      * @param furnaceProperties Property for this furnace
      */
     public Furnace(String name, FurnaceProperties furnaceProperties) {
@@ -74,11 +75,12 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         this.input = null;
         this.output = null;
         this.inventory = Bukkit.createInventory(this, InventoryType.FURNACE, Util.getColString(name));
+        this.experience = 0.0f;
         this.updateInventory();
     }
 
     // Used for deserializer
-    private Furnace(String name, UUID uuid, int cookTime, int fuelTime, ItemStack fuel, ItemStack input, ItemStack output, FurnaceProperties furnaceProperties) {
+    private Furnace(String name, UUID uuid, int cookTime, int fuelTime, float xp, ItemStack fuel, ItemStack input, ItemStack output, FurnaceProperties furnaceProperties) {
         super(uuid, name);
         this.recipeManager = VirtualFurnaceAPI.getInstance().getRecipeManager();
         this.cookTime = cookTime;
@@ -100,6 +102,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         } else {
             this.fuelTimeTotal = 0;
         }
+        this.experience = xp;
         this.inventory = Bukkit.createInventory(this, InventoryType.FURNACE, Util.getColString(name));
         this.updateInventory();
     }
@@ -167,6 +170,18 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
      */
     public ItemStack getOutput() {
         return output;
+    }
+
+    /**
+     * Get the current experience stored in this furnace
+     * <p>This will also reset the current experience back to 0.0</p>
+     *
+     * @return Current experience stored in this furnace
+     */
+    public float extractExperience() {
+        float exp = this.experience;
+        this.experience = 0.0f;
+        return exp;
     }
 
     /**
@@ -281,6 +296,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
             out = this.output.clone();
             out.setAmount(out.getAmount() + 1);
         }
+        this.experience += result.getExperience();
 
         FurnaceCookEvent event = new FurnaceCookEvent(this, this.input, out);
         Bukkit.getPluginManager().callEvent(event);
@@ -343,6 +359,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         result.put("properties", this.furnaceProperties);
         result.put("cookTime", this.cookTime);
         result.put("fuelTime", this.fuelTime);
+        result.put("xp", this.experience);
         result.put("fuel", this.fuel);
         result.put("input", this.input);
         result.put("output", this.output);
@@ -362,10 +379,11 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         FurnaceProperties furnaceProperties = (FurnaceProperties) args.get("properties");
         int cookTime = ((Number) args.get("cookTime")).intValue();
         int fuelTime = ((Number) args.get("fuelTime")).intValue();
+        float xp = args.containsKey("xp") ? ((Number) args.get("xp")).floatValue() : 0.0f;
         ItemStack fuel = ((ItemStack) args.get("fuel"));
         ItemStack input = ((ItemStack) args.get("input"));
         ItemStack output = ((ItemStack) args.get("output"));
-        return new Furnace(name, uuid, cookTime, fuelTime, fuel, input, output, furnaceProperties);
+        return new Furnace(name, uuid, cookTime, fuelTime, xp, fuel, input, output, furnaceProperties);
     }
 
 }

@@ -5,13 +5,18 @@ import com.shanebeestudios.vf.api.machine.Furnace;
 import com.shanebeestudios.vf.api.tile.Tile;
 import org.bukkit.Chunk;
 import org.bukkit.block.Block;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 class FurnaceListener implements Listener {
@@ -51,6 +56,33 @@ class FurnaceListener implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler
+    private void onInventoryClick(InventoryClickEvent event) {
+        Inventory inventory = event.getInventory();
+        InventoryHolder holder = inventory.getHolder();
+        HumanEntity clicker = event.getWhoClicked();
+        if (holder instanceof Furnace && clicker instanceof Player) {
+            int slot = event.getRawSlot();
+            if (slot == 2) {
+                handleOutput(((Player) clicker), ((Furnace) holder));
+            } else if (slot == 1) {
+                handleFuel();
+            }
+        }
+    }
+
+    private void handleOutput(Player player, Furnace furnace) {
+        ItemStack output = furnace.getOutput();
+        if (output == null) return;
+
+        float exp = furnace.extractExperience();
+        player.giveExp((int) exp);
+    }
+
+    private void handleFuel() {
+        // TODO this will be used for custom fuels
     }
 
     @EventHandler
