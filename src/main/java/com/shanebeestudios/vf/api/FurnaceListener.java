@@ -2,6 +2,7 @@ package com.shanebeestudios.vf.api;
 
 import com.shanebeestudios.vf.api.chunk.VirtualChunk;
 import com.shanebeestudios.vf.api.machine.Furnace;
+import com.shanebeestudios.vf.api.recipe.Fuel;
 import com.shanebeestudios.vf.api.tile.Tile;
 import org.bukkit.Chunk;
 import org.bukkit.block.Block;
@@ -17,15 +18,18 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 class FurnaceListener implements Listener {
 
     private final FurnaceManager furnaceManager;
+    private final RecipeManager recipeManager;
     private final TileManager tileManager;
 
     FurnaceListener(VirtualFurnaceAPI virtualFurnaceAPI) {
         this.furnaceManager = virtualFurnaceAPI.getFurnaceManager();
+        this.recipeManager = virtualFurnaceAPI.getRecipeManager();
         this.tileManager = virtualFurnaceAPI.getTileManager();
     }
 
@@ -46,14 +50,15 @@ class FurnaceListener implements Listener {
         Block block = event.getClickedBlock();
         if (block == null) return;
 
-        if (event.getHand() != EquipmentSlot.HAND) return; // TODO temp for debugging
         Chunk chunk = block.getChunk();
         VirtualChunk virtualChunk = tileManager.getChunk(chunk);
         if (virtualChunk != null) {
             Tile<?> tile = virtualChunk.getTile(block);
             if (tile != null) {
-                tile.activate(event.getPlayer());
                 event.setCancelled(true);
+                if (event.getHand() != EquipmentSlot.OFF_HAND) {
+                    tile.activate(event.getPlayer());
+                }
             }
         }
     }
@@ -64,25 +69,61 @@ class FurnaceListener implements Listener {
         InventoryHolder holder = inventory.getHolder();
         HumanEntity clicker = event.getWhoClicked();
         if (holder instanceof Furnace && clicker instanceof Player) {
+            Furnace furnace = ((Furnace) holder);
             int slot = event.getRawSlot();
+            // Give XP to player when they extract from the furnace
             if (slot == 2) {
-                handleOutput(((Player) clicker), ((Furnace) holder));
-            } else if (slot == 1) {
-                handleFuel();
+                ItemStack output = furnace.getOutput();
+                if (output != null) {
+                    float exp = furnace.extractExperience();
+                    ((Player) clicker).giveExp((int) exp);
+                }
+            }
+            // Enable putting custom fuels in the furnaces
+            else if (slot == 1) {
+                ItemStack cursor = clicker.getItemOnCursor();
+
+                Fuel fuel = recipeManager.getFuelByMaterial(cursor.getType());
+                if (fuel != null && isNotVanillaFuel(cursor)) {
+                    ItemStack oldCursor = cursor.clone();
+                    ItemStack furnaceFuel = furnace.getFuel();
+                    event.setCancelled(true);
+                    if (furnaceFuel != null && furnaceFuel.getType() == cursor.getType()) {
+                        InventoryView view = event.getView();
+                        int fuelAmount = furnaceFuel.getAmount();
+                        int cursorAmount = cursor.getAmount();
+                        int maxStack = cursor.getType().getMaxStackSize();
+
+                        ItemStack fuelSlot = view.getItem(1);
+                        assert fuelSlot != null;
+                        if (fuelAmount < maxStack) {
+                            int diff = maxStack - fuelAmount;
+                            if (cursorAmount < diff) {
+                                cursor.setAmount(0);
+                                fuelSlot.setAmount(fuelAmount + cursorAmount);
+                            } else {
+                                cursor.setAmount(cursorAmount - diff);
+                                fuelSlot.setAmount(maxStack);
+                            }
+                            ((Player) clicker).updateInventory();
+                        }
+
+                    } else {
+                        clicker.setItemOnCursor(furnaceFuel);
+                        event.getView().setItem(1, oldCursor);
+                    }
+                }
             }
         }
     }
 
-    private void handleOutput(Player player, Furnace furnace) {
-        ItemStack output = furnace.getOutput();
-        if (output == null) return;
-
-        float exp = furnace.extractExperience();
-        player.giveExp((int) exp);
-    }
-
-    private void handleFuel() {
-        // TODO this will be used for custom fuels
+    private boolean isNotVanillaFuel(ItemStack itemStack) {
+        for (Fuel fuel : Fuel.getVanillaFuels()) {
+            if (fuel.getFuel() == itemStack.getType()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @EventHandler
