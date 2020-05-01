@@ -1,6 +1,7 @@
 package com.shanebeestudios.vf.api;
 
 import com.shanebeestudios.vf.api.chunk.VirtualChunk;
+import com.shanebeestudios.vf.api.event.machine.FurnaceExtractEvent;
 import com.shanebeestudios.vf.api.machine.Furnace;
 import com.shanebeestudios.vf.api.recipe.Fuel;
 import com.shanebeestudios.vf.api.tile.Tile;
@@ -75,8 +76,13 @@ class FurnaceListener implements Listener {
             if (slot == 2) {
                 ItemStack output = furnace.getOutput();
                 if (output != null) {
-                    float exp = furnace.extractExperience();
-                    ((Player) clicker).giveExp((int) exp);
+                    int exp = (int) furnace.extractExperience();
+                    // Call the furnace extract event
+                    FurnaceExtractEvent extractEvent = new FurnaceExtractEvent(furnace, ((Player) clicker), output, exp);
+                    extractEvent.callEvent();
+
+                    ((Player) clicker).giveExp(extractEvent.getExperience());
+                    event.setCurrentItem(extractEvent.getItemStack());
                 }
             }
             // Enable putting custom fuels in the furnaces
@@ -85,7 +91,6 @@ class FurnaceListener implements Listener {
 
                 Fuel fuel = recipeManager.getFuelByMaterial(cursor.getType());
                 if (fuel != null && isNotVanillaFuel(cursor)) {
-                    ItemStack oldCursor = cursor.clone();
                     ItemStack furnaceFuel = furnace.getFuel();
                     event.setCancelled(true);
                     if (furnaceFuel != null && furnaceFuel.getType() == cursor.getType()) {
@@ -109,6 +114,7 @@ class FurnaceListener implements Listener {
                         }
 
                     } else {
+                        ItemStack oldCursor = cursor.clone();
                         clicker.setItemOnCursor(furnaceFuel);
                         event.getView().setItem(1, oldCursor);
                     }
