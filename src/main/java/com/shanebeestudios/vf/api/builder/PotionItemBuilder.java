@@ -83,9 +83,7 @@ public class PotionItemBuilder extends ItemBuilder {
         if (isNotPotion(material)) {
             super.itemStack.setType(Material.POTION);
         }
-        PotionMeta pMeta = ((PotionMeta) super.itemStack.getItemMeta());
-        meta.accept(pMeta);
-        super.itemStack.setItemMeta(pMeta);
+        meta.accept(((PotionMeta) super.itemMeta));
     }
 
     /**
