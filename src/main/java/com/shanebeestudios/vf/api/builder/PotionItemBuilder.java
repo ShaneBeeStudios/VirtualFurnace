@@ -3,7 +3,6 @@ package com.shanebeestudios.vf.api.builder;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
@@ -66,11 +65,8 @@ public class PotionItemBuilder extends ItemBuilder {
      * @param material Material for this new item
      * @param meta     Consumer to manipulate meta
      */
-    public PotionItemBuilder(@NotNull Material material, @NotNull Consumer<ItemMeta> meta) {
-        super(material, meta);
-        if (isNotPotion(material)) {
-            super.itemStack.setType(Material.POTION);
-        }
+    public PotionItemBuilder(@NotNull Material material, @NotNull Consumer<PotionMeta> meta) {
+        this(material, 1, meta);
     }
 
     /**
@@ -82,11 +78,14 @@ public class PotionItemBuilder extends ItemBuilder {
      * @param amount   Amount for this item
      * @param meta     Consumer to manipulate meta
      */
-    public PotionItemBuilder(@NotNull Material material, int amount, @NotNull Consumer<ItemMeta> meta) {
-        super(material, amount, meta);
+    public PotionItemBuilder(@NotNull Material material, int amount, @NotNull Consumer<PotionMeta> meta) {
+        super(material, amount);
         if (isNotPotion(material)) {
             super.itemStack.setType(Material.POTION);
         }
+        PotionMeta pMeta = ((PotionMeta) super.itemStack.getItemMeta());
+        meta.accept(pMeta);
+        super.itemStack.setItemMeta(pMeta);
     }
 
     /**
