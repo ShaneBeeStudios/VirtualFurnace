@@ -8,6 +8,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * Utility class for reflection
+ */
 @SuppressWarnings("unused")
 public class ReflectionUtils {
 
