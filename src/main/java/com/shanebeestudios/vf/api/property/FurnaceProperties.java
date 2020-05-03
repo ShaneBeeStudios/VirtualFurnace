@@ -2,7 +2,6 @@ package com.shanebeestudios.vf.api.property;
 
 import com.shanebeestudios.vf.api.machine.Furnace;
 import com.shanebeestudios.vf.api.util.Util;
-import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +15,7 @@ import java.util.Objects;
  * <p>Used to manipulate the speed properties of a furnace</p>
  */
 @SuppressWarnings({"unused", "SameParameterValue"})
-public class FurnaceProperties extends Properties implements Keyed, ConfigurationSerializable {
+public class FurnaceProperties extends Properties implements ConfigurationSerializable {
 
     /**
      * Pre-made property to mimic a vanilla Minecraft furnace
@@ -44,7 +43,10 @@ public class FurnaceProperties extends Properties implements Keyed, Configuratio
     private static FurnaceProperties getProperty(String key) {
         for (NamespacedKey namespacedKey : KEY_MAP.keySet()) {
             if (namespacedKey.getKey().equalsIgnoreCase(key)) {
-                return (FurnaceProperties) KEY_MAP.get(namespacedKey);
+                Properties property = KEY_MAP.get(namespacedKey);
+                if (property instanceof FurnaceProperties) {
+                    return (FurnaceProperties) KEY_MAP.get(namespacedKey);
+                }
             }
         }
         return null;
@@ -93,12 +95,6 @@ public class FurnaceProperties extends Properties implements Keyed, Configuratio
      */
     public double getFuelMultiplier() {
         return this.fuelX;
-    }
-
-    @NotNull
-    @Override
-    public NamespacedKey getKey() {
-        return this.key;
     }
 
     @Override
