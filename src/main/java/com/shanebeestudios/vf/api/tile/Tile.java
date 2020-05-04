@@ -131,7 +131,7 @@ public abstract class Tile<M extends Machine> {
      * @return True if BlockData matches
      */
     public boolean blockDataMatches(@NotNull Block block) {
-        return this.blockData.equals(block.getBlockData());
+        return this.blockData.getMaterial() == block.getType();
     }
 
     /**
