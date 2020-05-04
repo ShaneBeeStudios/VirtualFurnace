@@ -1,13 +1,9 @@
-package com.shanebeestudios.vf.api;
+package com.shanebeestudios.vf.api.manager;
 
+import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import com.shanebeestudios.vf.api.machine.Furnace;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
-import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -16,12 +12,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -30,38 +20,10 @@ import java.util.function.Consumer;
  * <p>You can get an instance of this class from <b>{@link VirtualFurnaceAPI#getFurnaceManager()}</b></p>
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public class FurnaceManager {
+public class FurnaceManager extends Manager<Furnace> {
 
-    private final VirtualFurnaceAPI virtualFurnaceAPI;
-    private File furnaceFile;
-    private FileConfiguration furnaceConfig;
-    private final Map<UUID, Furnace> furnaceMap;
-    private final NamespacedKey key;
-
-    FurnaceManager(VirtualFurnaceAPI virtualFurnaceAPI) {
-        this.virtualFurnaceAPI = virtualFurnaceAPI;
-        this.furnaceMap = new HashMap<>();
-        this.key = new NamespacedKey(virtualFurnaceAPI.getJavaPlugin(), "furnaceID");
-        loadFurnaceConfig();
-    }
-
-    /**
-     * Get a collection of all {@link Furnace}s
-     *
-     * @return Collection of all furnaces
-     */
-    public Collection<Furnace> getAllFurnaces() {
-        return Collections.unmodifiableCollection(this.furnaceMap.values());
-    }
-
-    /**
-     * Get a {@link Furnace} by ID
-     *
-     * @param uuid ID of furnace to grab
-     * @return Furnace from ID (null if a furnace with this ID does not exist)
-     */
-    public Furnace getByID(@NotNull UUID uuid) {
-        return this.furnaceMap.get(uuid);
+    public FurnaceManager(VirtualFurnaceAPI API) {
+        super(API, "furnace");
     }
 
     /**
@@ -80,7 +42,7 @@ public class FurnaceManager {
      * Create a new furnace
      * <p>This will create a new furnace, add it to the tick list, and save to file</p>
      *
-     * @param name       Name of new furnace (This shows up in the inventory view)
+     * @param name              Name of new furnace (This shows up in the inventory view)
      * @param furnaceProperties Properties to apply to this furnace
      * @return Instance of this new furnace
      */
@@ -105,9 +67,9 @@ public class FurnaceManager {
      * Create a new furnace
      * <p>This will create a new furnace, add it to the tick list, and save to file</p>
      *
-     * @param name       Name of new furnace (This shows up in the inventory view)
+     * @param name              Name of new furnace (This shows up in the inventory view)
      * @param furnaceProperties Properties to apply to this furnace
-     * @param function   Function to run before furnace is created
+     * @param function          Function to run before furnace is created
      * @return Instance of this new furnace
      */
     public Furnace createFurnace(@NotNull String name, @NotNull FurnaceProperties furnaceProperties, @Nullable Consumer<Furnace> function) {
@@ -115,8 +77,8 @@ public class FurnaceManager {
         if (function != null) {
             function.accept(furnace);
         }
-        this.furnaceMap.put(furnace.getUniqueID(), furnace);
-        saveFurnace(furnace, true);
+        this.machineMap.put(furnace.getUniqueID(), furnace);
+        saveMachine(furnace, true);
         return furnace;
     }
 
@@ -136,10 +98,10 @@ public class FurnaceManager {
     /**
      * Create a {@link Furnace} that is attached to an {@link ItemStack}
      *
-     * @param name       Name of furnace (this will show up in the furnace UI)
+     * @param name              Name of furnace (this will show up in the furnace UI)
      * @param furnaceProperties Properties associated with this furnace item
-     * @param material   Material of the new ItemStack
-     * @param glowing    Whether the item should glow (enchanted)
+     * @param material          Material of the new ItemStack
+     * @param glowing           Whether the item should glow (enchanted)
      * @return New ItemStack with a furnace attached
      */
     public ItemStack createItemWithFurnace(@NotNull String name, @NotNull FurnaceProperties furnaceProperties, @NotNull Material material, boolean glowing) {
@@ -163,11 +125,11 @@ public class FurnaceManager {
     /**
      * Create a {@link Furnace} that is attached to an {@link ItemStack}
      *
-     * @param name       Name of furnace (this will show up in the furnace UI)
+     * @param name              Name of furnace (this will show up in the furnace UI)
      * @param furnaceProperties Properties associated with this furnace item
-     * @param material   Material of the new ItemStack
-     * @param glowing    Whether the item should glow (enchanted)
-     * @param function   Function to run before furnace is created
+     * @param material          Material of the new ItemStack
+     * @param glowing           Whether the item should glow (enchanted)
+     * @param function          Function to run before furnace is created
      * @return New ItemStack with a furnace attached
      */
     public ItemStack createItemWithFurnace(@NotNull String name, @NotNull FurnaceProperties furnaceProperties, @NotNull Material material, boolean glowing, @Nullable Consumer<Furnace> function) {
@@ -189,10 +151,10 @@ public class FurnaceManager {
     /**
      * Create a {@link Furnace} that is attached to an {@link ItemStack}
      *
-     * @param name       Name of furnace (this will show up in the furnace UI)
+     * @param name              Name of furnace (this will show up in the furnace UI)
      * @param furnaceProperties Properties associated with this furnace item
-     * @param itemStack  ItemStack to be copied and have a furnace attached
-     * @param glowing    Whether the item should glow (enchanted)
+     * @param itemStack         ItemStack to be copied and have a furnace attached
+     * @param glowing           Whether the item should glow (enchanted)
      * @return Clone of the input ItemStack with a furnace attached
      */
     public ItemStack createItemWithFurnace(@NotNull String name, @NotNull FurnaceProperties furnaceProperties, @NotNull ItemStack itemStack, boolean glowing) {
@@ -216,11 +178,11 @@ public class FurnaceManager {
     /**
      * Create a {@link Furnace} that is attached to an {@link ItemStack}
      *
-     * @param name       Name of furnace (this will show up in the furnace UI)
+     * @param name              Name of furnace (this will show up in the furnace UI)
      * @param furnaceProperties Properties associated with this furnace item
-     * @param itemStack  ItemStack to be copied and have a furnace attached
-     * @param glowing    Whether the item should glow (enchanted)
-     * @param function   Function to run before furnace is created
+     * @param itemStack         ItemStack to be copied and have a furnace attached
+     * @param glowing           Whether the item should glow (enchanted)
+     * @param function          Function to run before furnace is created
      * @return Clone of the input ItemStack with a furnace attached
      */
     public ItemStack createItemWithFurnace(@NotNull String name, @NotNull FurnaceProperties furnaceProperties, @NotNull ItemStack itemStack, boolean glowing, @Nullable Consumer<Furnace> function) {
@@ -228,7 +190,7 @@ public class FurnaceManager {
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
         if (glowing) {
-            if (item.getType() == Material.ARROW) {
+            if (item.getType() == Material.BOW) {
                 meta.addEnchant(Enchantment.DAMAGE_ALL, 1, true);
             } else {
                 meta.addEnchant(Enchantment.ARROW_INFINITE, 1, true);
@@ -261,86 +223,6 @@ public class FurnaceManager {
             return getByID(UUID.fromString(u));
         }
         return null;
-    }
-
-    private void loadFurnaceConfig() {
-        if (this.furnaceFile == null) {
-            this.furnaceFile = new File(this.virtualFurnaceAPI.getJavaPlugin().getDataFolder(), "furnaces.yml");
-        }
-        if (!furnaceFile.exists()) {
-            this.virtualFurnaceAPI.getJavaPlugin().saveResource("furnaces.yml", false);
-        }
-        this.furnaceConfig = YamlConfiguration.loadConfiguration(this.furnaceFile);
-        loadFurnaces();
-    }
-
-    void loadFurnaces() {
-        ConfigurationSection section = this.furnaceConfig.getConfigurationSection("furnaces");
-        if (section != null) {
-            for (String string : section.getKeys(true)) {
-                if (section.get(string) instanceof Furnace) {
-                    Furnace furnace = ((Furnace) section.get(string));
-                    this.furnaceMap.put(UUID.fromString(string), (Furnace) section.get(string));
-                }
-            }
-        }
-        Util.log("Loaded: &b" + this.furnaceMap.size() + "&7 furnaces");
-    }
-
-    /**
-     * Save a furnace to YAML storage
-     * <p><b>NOTE:</b> If choosing not to save to file, this change will not take effect
-     * in the YAML file, this may be useful for saving a large batch and saving file at the
-     * end of the batch change, use {@link #saveConfig()} to save all changes to file</p>
-     *
-     * @param furnace    Furnace to save
-     * @param saveToFile Whether to save to file
-     */
-    public void saveFurnace(@NotNull Furnace furnace, boolean saveToFile) {
-        this.furnaceConfig.set("furnaces." + furnace.getUniqueID(), furnace);
-        if (saveToFile)
-            saveConfig();
-    }
-
-    /**
-     * Remove a furnace from YAML storage
-     * <p><b>NOTE:</b> If choosing not to save to file, this change will not take effect
-     * in the YAML file, this may be useful it removing a large batch and saving file at the
-     * end of the batch change, use {@link #saveConfig()} to save all changes to file</p>
-     *
-     * @param furnace    Furnace to remove
-     * @param saveToFile Whether to save changes to file
-     */
-    public void removeFurnaceFromConfig(@NotNull Furnace furnace, boolean saveToFile) {
-        this.furnaceConfig.set("furnaces." + furnace.getUniqueID(), null);
-        if (saveToFile)
-            saveConfig();
-    }
-
-    /**
-     * Save all furnaces to file
-     */
-    public void saveAll() {
-        for (Furnace furnace : this.furnaceMap.values()) {
-            saveFurnace(furnace, false);
-        }
-        saveConfig();
-    }
-
-    /**
-     * Save current furnace YAML from RAM to file
-     */
-    public void saveConfig() {
-        try {
-            furnaceConfig.save(furnaceFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    void shutdown() {
-        saveAll();
-        furnaceMap.clear();
     }
 
 }
