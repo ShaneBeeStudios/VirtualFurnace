@@ -7,6 +7,14 @@ import org.bukkit.Bukkit;
  */
 public abstract class Event extends org.bukkit.event.Event {
 
+    public Event() {
+        super();
+    }
+
+    public Event(boolean isAsync) {
+        super(isAsync);
+    }
+
     /**
      * Call the event
      * <p>This method just simplifies the need to use Bukkit's

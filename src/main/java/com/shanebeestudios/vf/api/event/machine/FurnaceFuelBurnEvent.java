@@ -1,9 +1,9 @@
 package com.shanebeestudios.vf.api.event.machine;
 
+import com.shanebeestudios.vf.api.event.Event;
 import com.shanebeestudios.vf.api.machine.Furnace;
-import com.shanebeestudios.vf.api.recipe.Fuel;
+import com.shanebeestudios.vf.api.recipe.FurnaceFuel;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -18,15 +18,15 @@ public class FurnaceFuelBurnEvent extends Event implements Cancellable {
 
     private final Furnace furnace;
     private final ItemStack fuelItem;
-    private final Fuel fuel;
+    private final FurnaceFuel furnaceFuel;
     private int burnTime;
     private boolean cancelled;
 
-    public FurnaceFuelBurnEvent(@NotNull Furnace furnace, @NotNull ItemStack fuelItem, @NotNull Fuel fuel, int burnTime) {
+    public FurnaceFuelBurnEvent(@NotNull Furnace furnace, @NotNull ItemStack fuelItem, @NotNull FurnaceFuel furnaceFuel, int burnTime) {
         super(true);
         this.furnace = furnace;
         this.fuelItem = fuelItem;
-        this.fuel = fuel;
+        this.furnaceFuel = furnaceFuel;
         this.burnTime = burnTime;
         this.cancelled = false;
     }
@@ -54,8 +54,8 @@ public class FurnaceFuelBurnEvent extends Event implements Cancellable {
      *
      * @return Fuel for this event
      */
-    public Fuel getFuel() {
-        return fuel;
+    public FurnaceFuel getFurnaceFuel() {
+        return furnaceFuel;
     }
 
     /**
