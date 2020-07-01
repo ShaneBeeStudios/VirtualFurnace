@@ -254,8 +254,7 @@ public class FurnaceManager {
      */
     public Furnace getFurnaceFromItemStack(@NotNull ItemStack itemStack) {
         ItemMeta meta = itemStack.getItemMeta();
-        assert meta != null;
-        if (meta.getPersistentDataContainer().has(this.key, PersistentDataType.STRING)) {
+        if (meta != null && meta.getPersistentDataContainer().has(this.key, PersistentDataType.STRING)) {
             String u = meta.getPersistentDataContainer().get(this.key, PersistentDataType.STRING);
             if (u == null) return null;
             return getByID(UUID.fromString(u));
