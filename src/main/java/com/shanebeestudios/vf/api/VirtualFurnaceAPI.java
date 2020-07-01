@@ -1,8 +1,13 @@
 package com.shanebeestudios.vf.api;
 
+import com.shanebeestudios.vf.api.machine.Brewer;
 import com.shanebeestudios.vf.api.machine.Furnace;
+import com.shanebeestudios.vf.api.manager.BrewerManager;
+import com.shanebeestudios.vf.api.manager.FurnaceManager;
+import com.shanebeestudios.vf.api.manager.TileManager;
+import com.shanebeestudios.vf.api.property.BrewerProperties;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
-import com.shanebeestudios.vf.api.task.FurnaceTick;
+import com.shanebeestudios.vf.api.task.MachineTick;
 import com.shanebeestudios.vf.api.task.TileTick;
 import com.shanebeestudios.vf.api.tile.FurnaceTile;
 import com.shanebeestudios.vf.api.util.Util;
@@ -25,6 +30,8 @@ public class VirtualFurnaceAPI {
         ConfigurationSerialization.registerClass(Furnace.class, "furnace");
         ConfigurationSerialization.registerClass(FurnaceProperties.class, "furnace_properties");
         ConfigurationSerialization.registerClass(FurnaceTile.class, "tile");
+        ConfigurationSerialization.registerClass(Brewer.class, "brewer");
+        ConfigurationSerialization.registerClass(BrewerProperties.class, "brewer_properties");
     }
 
     private boolean enabled = true;
@@ -33,8 +40,9 @@ public class VirtualFurnaceAPI {
     private final JavaPlugin plugin;
     private RecipeManager recipeManager;
     private FurnaceManager furnaceManager;
+    private BrewerManager brewerManager;
     private TileManager tileManager;
-    private FurnaceTick furnaceTick;
+    private MachineTick machineTick;
     private TileTick tileTick;
 
     /**
@@ -61,8 +69,9 @@ public class VirtualFurnaceAPI {
         if (!Util.classExists("org.bukkit.persistence.PersistentDataHolder")) {
             this.recipeManager = null;
             this.furnaceManager = null;
+            this.brewerManager = null;
             this.tileManager = null;
-            this.furnaceTick = null;
+            this.machineTick = null;
             this.tileTick = null;
             Util.error("&cFailed to initialize VirtualFurnaceAPI");
             Util.error("&7  - Bukkit version: &b" + Bukkit.getBukkitVersion() + " &7is not supported!");
@@ -74,10 +83,11 @@ public class VirtualFurnaceAPI {
         }
         this.recipeManager = new RecipeManager();
         this.furnaceManager = new FurnaceManager(this);
+        this.brewerManager = new BrewerManager(this);
         this.tileManager = new TileManager(this);
         this.tileManager.load();
-        this.furnaceTick = new FurnaceTick(this);
-        this.furnaceTick.start();
+        this.machineTick = new MachineTick(this);
+        this.machineTick.start();
         this.tileTick = new TileTick(this);
         this.tileTick.start();
         Bukkit.getPluginManager().registerEvents(new FurnaceListener(this), javaPlugin);
@@ -90,13 +100,15 @@ public class VirtualFurnaceAPI {
      * This should be used in a plugin's {@link Plugin#onDisable() onDisable()} method</p>
      */
     public void disableAPI() {
-        this.furnaceTick.cancel();
+        this.machineTick.cancel();
         this.tileTick.cancel();
-        this.furnaceTick = null;
+        this.machineTick = null;
         this.tileTick = null;
         this.furnaceManager.shutdown();
+        this.brewerManager.shutdown();
         this.tileManager.shutdown();
         this.furnaceManager = null;
+        this.brewerManager = null;
         this.tileManager = null;
         this.recipeManager = null;
         Util.log("Shut down API!");
@@ -107,7 +119,7 @@ public class VirtualFurnaceAPI {
      * <p>This is good to use in your onDisable() method, to prevent tasks still running on server shutdown/reload</p>
      */
     public void disableFurnaceTick() {
-        this.furnaceTick.cancel();
+        this.machineTick.cancel();
     }
 
     /**
@@ -148,6 +160,15 @@ public class VirtualFurnaceAPI {
     }
 
     /**
+     * Get an instance of the brewer manager
+     *
+     * @return Instance of the brewer manager
+     */
+    public BrewerManager getBrewerManager() {
+        return brewerManager;
+    }
+
+    /**
      * Get an instance of the tile manager
      *
      * @return Instance of the tile manager
@@ -161,8 +182,8 @@ public class VirtualFurnaceAPI {
      *
      * @return Instance of furnace tick
      */
-    public FurnaceTick getFurnaceTick() {
-        return furnaceTick;
+    public MachineTick getMachineTick() {
+        return machineTick;
     }
 
     /**

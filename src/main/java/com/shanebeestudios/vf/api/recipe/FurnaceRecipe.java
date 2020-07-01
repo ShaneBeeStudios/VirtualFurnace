@@ -149,7 +149,7 @@ public class FurnaceRecipe extends Recipe {
         return "FurnaceRecipe{" +
                 "key=" + key +
                 ", ingredient=" + ingredient +
-                ", result=" + result +
+                ", result=" + itemStack +
                 ", cookTime=" + cookTime +
                 ", experience=" + experience +
                 '}';

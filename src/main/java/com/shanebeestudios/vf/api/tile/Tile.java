@@ -22,24 +22,10 @@ public abstract class Tile<M extends Machine> {
     final int y;
     final int z;
     final String world;
-    private final BlockData blockData;
+    BlockData blockData;
 
     Tile(@NotNull M machine, int x, int y, int z, @NotNull World world) {
         this(machine, world.getBlockAt(x, y, z));
-    }
-
-    Tile(@NotNull M machine, int x, int y, int z, @NotNull String world) {
-        this.machine = machine;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.world = world;
-        World bukkitWorld = Bukkit.getWorld(world);
-        if (bukkitWorld != null) {
-            this.blockData = bukkitWorld.getBlockAt(x, y, z).getBlockData();
-        } else {
-            this.blockData = null;
-        }
     }
 
     Tile(@NotNull M machine, @NotNull Block block) {
@@ -49,6 +35,15 @@ public abstract class Tile<M extends Machine> {
         this.z = block.getZ();
         this.world = block.getWorld().getName();
         this.blockData = block.getBlockData();
+    }
+
+    Tile(@NotNull M machine, int x, int y, int z, @NotNull String world, BlockData blockData) {
+        this.machine = machine;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.world = world;
+        this.blockData = blockData;
     }
 
     /**
@@ -116,21 +111,23 @@ public abstract class Tile<M extends Machine> {
     }
 
     /**
-     * Get the {@link BlockData} of the block this tile is connected to
+     * Get the {@link BlockData} of this tile
+     * <p><b>NOTE: </b>This may not match the block exactly
+     * if the block was modified</p>
      *
-     * @return BlockData of the block this tile is connected to
+     * @return BlockData of this tile
      */
     public BlockData getBlockData() {
         return blockData;
     }
 
     /**
-     * Check if the {@link BlockData} of a block matches the BlockData of this tile
+     * Check if the {@link Block} of this tiles matches another block
      *
-     * @param block Block to check data for
-     * @return True if BlockData matches
+     * @param block Block to check
+     * @return True if block types match
      */
-    public boolean blockDataMatches(@NotNull Block block) {
+    public boolean blockMatches(@NotNull Block block) {
         return this.blockData.getMaterial() == block.getType();
     }
 
@@ -153,12 +150,18 @@ public abstract class Tile<M extends Machine> {
         VirtualFurnaceAPI.getInstance().getTileManager().removeTile(this);
     }
 
+    boolean isChunkLoaded() {
+        int x = getX() >> 4;
+        int z = getZ() >> 4;
+        return getBukkitWorld().isChunkLoaded(x, z);
+    }
+
     /**
      * Tick this tile
      */
     public void tick() {
-        if (blockDataMatches(getBlock())) {
-            machine.tick();
+        if (!isChunkLoaded() || blockMatches(getBlock())) {
+            machine.tick(this);
         } else {
             breakTile();
         }

@@ -1,9 +1,13 @@
-package com.shanebeestudios.vf.api;
+package com.shanebeestudios.vf.api.manager;
 
+import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import com.shanebeestudios.vf.api.chunk.ChunkKey;
 import com.shanebeestudios.vf.api.chunk.VirtualChunk;
+import com.shanebeestudios.vf.api.machine.Brewer;
 import com.shanebeestudios.vf.api.machine.Furnace;
+import com.shanebeestudios.vf.api.property.BrewerProperties;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
+import com.shanebeestudios.vf.api.tile.BrewerTile;
 import com.shanebeestudios.vf.api.tile.FurnaceTile;
 import com.shanebeestudios.vf.api.tile.Tile;
 import com.shanebeestudios.vf.api.util.Util;
@@ -60,17 +64,24 @@ public class TileManager {
     }
 
     private void loadTiles() {
-        ConfigurationSection section = this.tileConfig.getConfigurationSection("tiles");
+        for (TileType type : TileType.values()) {
+            loadTileGroups(type);
+        }
+        Util.log("Loaded: &b" + tiles.size() + "&7 tiles");
+    }
+
+    private void loadTileGroups(TileType type) {
+        ConfigurationSection section = this.tileConfig.getConfigurationSection("tiles." + type.getGroup());
         if (section != null) {
             for (String string : section.getKeys(true)) {
-                if (section.get(string) instanceof FurnaceTile) {
-                    tiles.add((FurnaceTile) section.get(string));
+                Object object = section.get(string);
+                if (object instanceof Tile<?>) {
+                    tiles.add((Tile<?>) object);
                 } else {
-                    Util.log("&cFailed to load tile: " + section.get(string));
+                    Util.log("&cFailed to load tile: " + object);
                 }
             }
         }
-        Util.log("Loaded: &b" + tiles.size() + "&7 tiles");
     }
 
     private void loadChunks() {
@@ -101,7 +112,8 @@ public class TileManager {
      * @param saveToFile Whether to save to file
      */
     public void saveTile(@NotNull Tile<?> tile, boolean saveToFile) {
-        this.tileConfig.set("tiles." + tile.getString(), tile);
+        String machineType = tile.getClass().getSimpleName().toLowerCase();
+        this.tileConfig.set("tiles." + machineType + "." + tile.getString(), tile);
         if (saveToFile)
             saveConfig();
     }
@@ -127,7 +139,7 @@ public class TileManager {
         }
     }
 
-    void shutdown() {
+    public void shutdown() {
         saveAllTiles();
         List<VirtualChunk> chunks = new ArrayList<>(loadedChunks);
         for (VirtualChunk chunk : chunks) {
@@ -203,21 +215,6 @@ public class TileManager {
     }
 
     /**
-     * Get a {@link VirtualChunk} based on a {@link Chunk Bukkit Chunk}
-     *
-     * @param chunk Chunk to check
-     * @return VirtualChunk relevant to Chunk
-     */
-    public VirtualChunk getChunk(@NotNull Chunk chunk) {
-        for (VirtualChunk mChunk : chunkMap.values()) {
-            if (chunk.getX() == mChunk.getX() && chunk.getZ() == mChunk.getZ()) {
-                return mChunk;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Get all {@link Tile Tiles}
      *
      * @return List of all Tiles
@@ -267,7 +264,8 @@ public class TileManager {
         if (virtualChunk != null) {
             virtualChunk.removeTile(tile);
             tiles.remove(tile);
-            tileConfig.set("tiles." + tile.getString(), null);
+            String tileType = tile.getClass().getSimpleName().toLowerCase();
+            tileConfig.set("tiles." + tileType + "." + tile.getString(), null);
             saveConfig();
             return true;
         }
@@ -430,6 +428,184 @@ public class TileManager {
         }
         virtualChunk.addTile(tile);
         return tile;
+    }
+
+
+    // TODO Split to test
+
+    /**
+     * Create a new BrewerTile attached to a block
+     * <p><b>NOTE:</b> DO NOT use <b>{@link BrewerManager#createBrewer(String)}</b> methods in this part,
+     * instead create a new <b>{@link Brewer}</b> object to prevent double ticking/saving.</p>
+     *
+     * @param block  Block to create new BrewerTile at
+     * @param brewer Brewer to add to this tile
+     * @return Instance of the new BrewerTile
+     */
+    public BrewerTile createBrewerTile(@NotNull Block block, @NotNull Brewer brewer) {
+        return createBrewerTile(block.getX(), block.getY(), block.getZ(), block.getWorld(), brewer, null, null);
+    }
+
+    /**
+     * Create a new BrewerTile attached to a block
+     * <p><b>NOTE:</b> DO NOT use <b>{@link BrewerManager#createBrewer(String)}</b> methods in this part,
+     * instead create a new <b>{@link Brewer}</b> object to prevent double ticking/saving.</p>
+     *
+     * @param block              Block to create new BrewerTile at
+     * @param brewer             Brewer to add to this tile
+     * @param brewerTileConsumer Consumer to manipulate this tile
+     * @return Instance of the new BrewerTile
+     */
+    public BrewerTile createBrewerTile(@NotNull Block block, @NotNull Brewer brewer, @NotNull Consumer<BrewerTile> brewerTileConsumer) {
+        return createBrewerTile(block.getX(), block.getY(), block.getZ(), block.getWorld(), brewer, null, brewerTileConsumer);
+    }
+
+    /**
+     * Create a new BrewerTile attached to a block
+     *
+     * @param block      Block to create new BrewerTile at
+     * @param name       Name of new Brewer
+     * @param properties Properties of new Brewer
+     * @return Instance of the new BrewerTile
+     */
+    public BrewerTile createBrewerTile(@NotNull Block block, @NotNull String name, @NotNull BrewerProperties properties) {
+        Brewer brewer = new Brewer(name, properties);
+        return createBrewerTile(block.getX(), block.getY(), block.getZ(), block.getWorld(), brewer, null, null);
+    }
+
+    /**
+     * Create a new BrewerTile attached to a block
+     *
+     * @param block              Block to create new BrewerTile at
+     * @param name               Name of new Brewer
+     * @param properties         Properties of new Brewer
+     * @param brewerTileConsumer Consumer to manipulate this tile
+     * @return Instance of the new BrewerTile
+     */
+    public BrewerTile createBrewerTile(@NotNull Block block, @NotNull String name, @NotNull BrewerProperties properties, @NotNull Consumer<BrewerTile> brewerTileConsumer) {
+        Brewer brewer = new Brewer(name, properties);
+        return createBrewerTile(block.getX(), block.getY(), block.getZ(), block.getWorld(), brewer, null, brewerTileConsumer);
+    }
+
+    /**
+     * Create a new BrewerTile attached to a block
+     *
+     * @param x          X location of block
+     * @param y          Y location of block
+     * @param z          Z location of block
+     * @param world      World of block
+     * @param name       Name of new Brewer
+     * @param properties Properties for new Brewer
+     * @return Instance of the new BrewerTile
+     */
+    public BrewerTile createBrewerTile(int x, int y, int z, @NotNull World world, @NotNull String name, @NotNull BrewerProperties properties) {
+        Brewer brewer = new Brewer(name, properties);
+        return createBrewerTile(x, y, z, world, brewer, null, null);
+    }
+
+    /**
+     * Create a new BrewerTile attached to a block
+     *
+     * @param x              X location of block
+     * @param y              Y location of block
+     * @param z              Z location of block
+     * @param world          World of block
+     * @param name           Name of new Brewer
+     * @param properties     Properties for new Brewer
+     * @param brewerConsumer Consumer to manipulate this brewer
+     * @return Instance of the new BrewerTile
+     */
+    public BrewerTile createBrewerTile(int x, int y, int z, @NotNull World world, @NotNull String name, @NotNull BrewerProperties properties, @NotNull Consumer<Brewer> brewerConsumer) {
+        Brewer brewer = new Brewer(name, properties);
+        return createBrewerTile(x, y, z, world, brewer, brewerConsumer, null);
+    }
+
+    /**
+     * Create a new BrewerTile attached to a block
+     * <p><b>NOTE:</b> DO NOT use <b>{@link BrewerManager#createBrewer(String)}</b> methods in this part,
+     * instead create a new <b>{@link Brewer}</b> object to prevent double ticking/saving.</p>
+     *
+     * @param x      X location of block
+     * @param y      Y location of block
+     * @param z      Z location of block
+     * @param world  World of block
+     * @param brewer Brewer to add to this tile
+     * @return Instance of the new BrewerTile
+     */
+    public BrewerTile createBrewerTile(int x, int y, int z, @NotNull World world, @NotNull Brewer brewer) {
+        return createBrewerTile(x, y, z, world, brewer, null, null);
+    }
+
+    /**
+     * Create a new BrewerTile attached to a block
+     * <p><b>NOTE:</b> DO NOT use <b>{@link BrewerManager#createBrewer(String)}</b> methods in this part,
+     * instead create a new <b>{@link Brewer}</b> object to prevent double ticking/saving.</p>
+     *
+     * @param x              X location of block
+     * @param y              Y location of block
+     * @param z              Z location of block
+     * @param world          World of block
+     * @param brewer         Brewer to add to this tile
+     * @param brewerConsumer Consumer to manipulate this brewer
+     * @return Instance of the new BrewerTile
+     */
+    public BrewerTile createBrewerTile(int x, int y, int z, @NotNull World world, @NotNull Brewer brewer, @NotNull Consumer<Brewer> brewerConsumer) {
+        return createBrewerTile(x, y, z, world, brewer, brewerConsumer, null);
+    }
+
+    /**
+     * Create a new BrewerTile attached to a block
+     * <p><b>NOTE:</b> DO NOT use <b>{@link BrewerManager#createBrewer(String)}</b> methods in this part,
+     * instead create a new <b>{@link Brewer}</b> object to prevent double ticking/saving.</p>
+     *
+     * @param x                  X location of block
+     * @param y                  Y location of block
+     * @param z                  Z location of block
+     * @param world              World of block
+     * @param brewer             Brewer to add to this tile
+     * @param brewerConsumer     Consumer to manipulate this brewer
+     * @param brewerTileConsumer Consumer to manipulate this tile
+     * @return Instance of the new BrewerTile
+     */
+    public BrewerTile createBrewerTile(int x, int y, int z, @NotNull World world, @NotNull Brewer brewer, Consumer<Brewer> brewerConsumer, Consumer<BrewerTile> brewerTileConsumer) {
+        if (brewerConsumer != null) {
+            brewerConsumer.accept(brewer);
+        }
+        BrewerTile tile = new BrewerTile(brewer, x, y, z, world);
+        if (brewerTileConsumer != null) {
+            brewerTileConsumer.accept(tile);
+        }
+        tiles.add(tile);
+        saveTile(tile, true);
+        int chunkX = x >> 4;
+        int chunkZ = z >> 4;
+        ChunkKey key = new ChunkKey(chunkX, chunkZ);
+        if (!chunkMap.containsKey(key)) {
+            chunkMap.put(key, new VirtualChunk(chunkX, chunkZ, world));
+        }
+        VirtualChunk virtualChunk = chunkMap.get(key);
+        if (virtualChunk.isBukkitChunkLoaded()) {
+            loadedChunks.add(virtualChunk);
+        }
+        virtualChunk.addTile(tile);
+        return tile;
+    }
+
+    private enum TileType {
+
+        FURNACE("furnacetile"),
+        BREWER("brewertile");
+
+        private final String group;
+
+        TileType(String group) {
+            this.group = group;
+        }
+
+        public String getGroup() {
+            return group;
+        }
+
     }
 
 }

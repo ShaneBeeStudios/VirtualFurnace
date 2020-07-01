@@ -1,6 +1,6 @@
 package com.shanebeestudios.vf.api.machine;
 
-import com.shanebeestudios.vf.api.util.Util;
+import com.shanebeestudios.vf.api.tile.Tile;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
@@ -39,9 +39,23 @@ public abstract class Machine {
     }
 
     /**
-     * Tick this machine.
+     * Tick this machine
+     * <p>Tile from {@link #tick(Tile)}
+     * will default to null</p>
      */
     public void tick() {
+        tick(null);
+    }
+
+    /**
+     * Tick this machine
+     * <p>Pass the {@link Tile} thru if this
+     * machine is part of a tile.</p>
+     *
+     * @param tile Tile to pass thru
+     */
+    public void tick(Tile<?> tile) {
+
     }
 
     @Override

@@ -2,9 +2,13 @@ package com.shanebeestudios.vf.api.tile;
 
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import com.shanebeestudios.vf.api.machine.Furnace;
+import com.shanebeestudios.vf.api.util.Util;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Lightable;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.inventory.ItemStack;
@@ -31,8 +35,8 @@ public class FurnaceTile extends Tile<Furnace> implements ConfigurationSerializa
     }
 
     // Used for de-serializing
-    private FurnaceTile(@NotNull Furnace machine, int x, int y, int z, @NotNull String world) {
-        super(machine, x, y, z, world);
+    private FurnaceTile(@NotNull Furnace machine, int x, int y, int z, @NotNull String world, BlockData blockData) {
+        super(machine, x, y, z, world, blockData);
     }
 
     @Override
@@ -67,6 +71,33 @@ public class FurnaceTile extends Tile<Furnace> implements ConfigurationSerializa
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        boolean update = false;
+        if (isChunkLoaded() && getBlockData() instanceof Lightable) {
+            Lightable data = ((Lightable) getBlockData());
+            if (data.isLit() && machine.getFuelTime() == 0) {
+                data.setLit(false);
+                update = true;
+            } else if (!data.isLit() && machine.getFuelTime() > 0) {
+                data.setLit(true);
+                update = true;
+            }
+            if (update) {
+                Util.log("Update Block: " + data);
+                this.blockData = data;
+                BukkitRunnable runnable = new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        getBlock().setBlockData(data);
+                    }
+                };
+                runnable.runTaskLater(VirtualFurnaceAPI.getInstance().getJavaPlugin(), 0);
+            }
+        }
+    }
+
+    @Override
     public String getString() {
         return "FurnaceTile{" +
                 "machine-type=" + machine.getClass().getSimpleName() +
@@ -96,6 +127,7 @@ public class FurnaceTile extends Tile<Furnace> implements ConfigurationSerializa
         result.put("y", y);
         result.put("z", z);
         result.put("world", world);
+        result.put("blockdata", getBlockData().getAsString());
         return result;
     }
 
@@ -104,7 +136,8 @@ public class FurnaceTile extends Tile<Furnace> implements ConfigurationSerializa
         int y = (int) args.get("y");
         int z = (int) args.get("z");
         String world = (String) args.get("world");
-        return new FurnaceTile((Furnace) args.get("machine"), x, y, z, world);
+        BlockData data = Bukkit.createBlockData(((String) args.get("blockdata")));
+        return new FurnaceTile((Furnace) args.get("machine"), x, y, z, world, data);
     }
 
 }

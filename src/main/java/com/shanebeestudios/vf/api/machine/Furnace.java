@@ -4,10 +4,12 @@ import com.shanebeestudios.vf.api.RecipeManager;
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import com.shanebeestudios.vf.api.event.machine.FurnaceCookEvent;
 import com.shanebeestudios.vf.api.event.machine.FurnaceFuelBurnEvent;
+import com.shanebeestudios.vf.api.manager.FurnaceManager;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
 import com.shanebeestudios.vf.api.property.PropertyHolder;
-import com.shanebeestudios.vf.api.recipe.Fuel;
+import com.shanebeestudios.vf.api.recipe.FurnaceFuel;
 import com.shanebeestudios.vf.api.recipe.FurnaceRecipe;
+import com.shanebeestudios.vf.api.tile.Tile;
 import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -46,7 +48,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
     /**
      * Create a new furnace object
      * <p><b>NOTE:</b> Creating a furnace object using this method will not tick the furnace.</p>
-     * <p>It is recommended to use <b>{@link com.shanebeestudios.vf.api.FurnaceManager#createFurnace(String)}</b></p>
+     * <p>It is recommended to use <b>{@link FurnaceManager#createFurnace(String)}</b></p>
      * <p><b>NOTE:</b> The properties used for this furnace will be <b>{@link FurnaceProperties#FURNACE}</b></p>
      *
      * @param name Name of the object which will show up in the UI
@@ -58,7 +60,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
     /**
      * Create a new furnace object
      * <p><b>NOTE:</b> Creating a furnace object using this method will not tick the furnace.</p>
-     * <p>It is recommended to use <b>{@link com.shanebeestudios.vf.api.FurnaceManager#createFurnace(String)}</b></p>
+     * <p>It is recommended to use <b>{@link FurnaceManager#createFurnace(String)}</b></p>
      *
      * @param name              Name of the object which will show up in the UI
      * @param furnaceProperties Property for this furnace
@@ -96,9 +98,9 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         } else {
             this.cookTimeTotal = 0;
         }
-        Fuel fuelF = recipeManager.getFuelByMaterial(fuel != null ? fuel.getType() : null);
-        if (fuelF != null) {
-            this.fuelTimeTotal = fuelF.getBurnTime();
+        FurnaceFuel furnaceFuelF = recipeManager.getFuelByMaterial(fuel != null ? fuel.getType() : null);
+        if (furnaceFuelF != null) {
+            this.fuelTimeTotal = furnaceFuelF.getBurnTime();
         } else {
             this.fuelTimeTotal = 0;
         }
@@ -184,6 +186,10 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         return exp;
     }
 
+    public int getFuelTime() {
+        return fuelTime;
+    }
+
     /**
      * Open this furnace's inventory to a player
      *
@@ -229,7 +235,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
      * and update the inventory</p>
      */
     @Override
-    public void tick() {
+    public void tick(Tile<?> tile) {
         if (this.fuelTime > 0) {
             this.fuelTime--;
             if (canCook()) {
@@ -244,7 +250,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         } else if (canBurn() && canCook()) {
             processBurn();
         } else if (this.cookTime > 0) {
-            if (canCook()) {
+            if (this.input != null) {
                 this.cookTime -= 5;
             } else {
                 this.cookTime = 0;
@@ -259,10 +265,10 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
     }
 
     private void processBurn() {
-        Fuel fuel = this.recipeManager.getFuelByMaterial(this.fuel.getType());
-        if (fuel == null) return;
-        FurnaceFuelBurnEvent event = new FurnaceFuelBurnEvent(this, this.fuel, fuel, fuel.getBurnTime());
-        Bukkit.getPluginManager().callEvent(event);
+        FurnaceFuel furnaceFuel = this.recipeManager.getFuelByMaterial(this.fuel.getType());
+        if (furnaceFuel == null) return;
+        FurnaceFuelBurnEvent event = new FurnaceFuelBurnEvent(this, this.fuel, furnaceFuel, furnaceFuel.getBurnTime());
+        event.callEvent();
         if (event.isCancelled()) {
             return;
         }
@@ -299,7 +305,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         this.experience += result.getExperience();
 
         FurnaceCookEvent event = new FurnaceCookEvent(this, this.input, out);
-        Bukkit.getPluginManager().callEvent(event);
+        event.callEvent();
         if (event.isCancelled()) {
             return;
         }

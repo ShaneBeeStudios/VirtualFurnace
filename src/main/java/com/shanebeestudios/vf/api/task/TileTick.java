@@ -1,6 +1,6 @@
 package com.shanebeestudios.vf.api.task;
 
-import com.shanebeestudios.vf.api.TileManager;
+import com.shanebeestudios.vf.api.manager.TileManager;
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import com.shanebeestudios.vf.api.chunk.VirtualChunk;
 import org.bukkit.Bukkit;

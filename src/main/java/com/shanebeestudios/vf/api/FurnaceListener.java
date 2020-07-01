@@ -2,10 +2,15 @@ package com.shanebeestudios.vf.api;
 
 import com.shanebeestudios.vf.api.chunk.VirtualChunk;
 import com.shanebeestudios.vf.api.event.machine.FurnaceExtractEvent;
+import com.shanebeestudios.vf.api.machine.Brewer;
 import com.shanebeestudios.vf.api.machine.Furnace;
-import com.shanebeestudios.vf.api.recipe.Fuel;
+import com.shanebeestudios.vf.api.manager.BrewerManager;
+import com.shanebeestudios.vf.api.manager.FurnaceManager;
+import com.shanebeestudios.vf.api.manager.TileManager;
+import com.shanebeestudios.vf.api.recipe.FurnaceFuel;
 import com.shanebeestudios.vf.api.tile.Tile;
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -25,11 +30,13 @@ import org.bukkit.inventory.ItemStack;
 class FurnaceListener implements Listener {
 
     private final FurnaceManager furnaceManager;
+    private final BrewerManager brewerManager;
     private final RecipeManager recipeManager;
     private final TileManager tileManager;
 
     FurnaceListener(VirtualFurnaceAPI virtualFurnaceAPI) {
         this.furnaceManager = virtualFurnaceAPI.getFurnaceManager();
+        this.brewerManager = virtualFurnaceAPI.getBrewerManager();
         this.recipeManager = virtualFurnaceAPI.getRecipeManager();
         this.tileManager = virtualFurnaceAPI.getTileManager();
     }
@@ -41,10 +48,17 @@ class FurnaceListener implements Listener {
 
         ItemStack hand = event.getItem();
         if (hand != null) {
+            Player player = event.getPlayer();
             Furnace furnace = this.furnaceManager.getFurnaceFromItemStack(hand);
             if (furnace != null) {
                 event.setCancelled(true);
-                furnace.openInventory(event.getPlayer());
+                furnace.openInventory(player);
+                return;
+            }
+            Brewer brewer = this.brewerManager.getBrewerFromItemStack(hand);
+            if (brewer != null) {
+                event.setCancelled(true);
+                brewer.openInventory(player);
                 return;
             }
         }
@@ -52,7 +66,7 @@ class FurnaceListener implements Listener {
         if (block == null) return;
 
         Chunk chunk = block.getChunk();
-        VirtualChunk virtualChunk = tileManager.getChunk(chunk);
+        VirtualChunk virtualChunk = tileManager.getChunk(chunk.getX(), chunk.getZ());
         if (virtualChunk != null) {
             Tile<?> tile = virtualChunk.getTile(block);
             if (tile != null) {
@@ -89,7 +103,7 @@ class FurnaceListener implements Listener {
             else if (slot == 1) {
                 ItemStack cursor = clicker.getItemOnCursor();
 
-                Fuel fuel = recipeManager.getFuelByMaterial(cursor.getType());
+                FurnaceFuel fuel = recipeManager.getFuelByMaterial(cursor.getType());
                 if (fuel != null && isNotVanillaFuel(cursor)) {
                     ItemStack furnaceFuel = furnace.getFuel();
                     event.setCancelled(true);
@@ -120,12 +134,27 @@ class FurnaceListener implements Listener {
                     }
                 }
             }
+        } else if (holder instanceof Brewer) {
+            Player player = ((Player) event.getWhoClicked());
+            ItemStack c = player.getItemOnCursor();
+            ItemStack cursor = c.getType() != Material.AIR ? c.clone() : null;
+            int slot = event.getRawSlot();
+            if (slot >= 0 && slot <= 4) {
+                // If shift-clicking we dont want to cancel since this will
+                // just be removing items from the inventory not placing in
+                if (event.isShiftClick()) {
+                    return;
+                }
+                event.setCancelled(true);
+                player.setItemOnCursor(event.getView().getItem(slot));
+                event.getView().setItem(slot, cursor);
+            }
         }
     }
 
     private boolean isNotVanillaFuel(ItemStack itemStack) {
-        for (Fuel fuel : Fuel.getVanillaFuels()) {
-            if (fuel.getFuel() == itemStack.getType()) {
+        for (FurnaceFuel furnaceFuel : FurnaceFuel.getVanillaFurnaceFuels()) {
+            if (furnaceFuel.getFuelItem().getType() == itemStack.getType()) {
                 return false;
             }
         }
@@ -134,16 +163,18 @@ class FurnaceListener implements Listener {
 
     @EventHandler
     private void onChunkLoad(ChunkLoadEvent event) {
-        handleChunk(event.getChunk(), true);
+        Chunk chunk = event.getChunk();
+        handleChunk(chunk.getX(), chunk.getZ(), true);
     }
 
     @EventHandler
     private void onChunkUnload(ChunkUnloadEvent event) {
-        handleChunk(event.getChunk(), false);
+        Chunk chunk = event.getChunk();
+        handleChunk(chunk.getX(), chunk.getZ(), false);
     }
 
-    private void handleChunk(Chunk chunk, boolean load) {
-        VirtualChunk virtualChunk = tileManager.getChunk(chunk);
+    private void handleChunk(int x, int z, boolean load) {
+        VirtualChunk virtualChunk = tileManager.getChunk(x, z);
         if (virtualChunk != null) {
             if (load) {
                 if (virtualChunk.isLoaded()) return;

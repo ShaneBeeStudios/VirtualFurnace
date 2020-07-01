@@ -74,7 +74,10 @@ public abstract class Fuel implements Keyed {
      * @return True if material matches
      */
     public boolean matchFuel(ItemStack itemStack) {
-        if (this.fuelItem != null && this.fuelItem.equals(itemStack)) {
+        if (itemStack == null) return false;
+        ItemStack clone = itemStack.clone();
+        clone.setAmount(1);
+        if (this.fuelItem != null && this.fuelItem.equals(clone)) {
             return true;
         } else return tag != null && tag.isTagged(itemStack.getType());
     }

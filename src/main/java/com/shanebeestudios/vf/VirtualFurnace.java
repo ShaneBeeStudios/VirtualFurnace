@@ -1,15 +1,21 @@
 package com.shanebeestudios.vf;
 
-import com.shanebeestudios.vf.api.FurnaceManager;
+import com.shanebeestudios.vf.api.builder.ItemBuilder;
+import com.shanebeestudios.vf.api.manager.BrewerManager;
+import com.shanebeestudios.vf.api.manager.FurnaceManager;
 import com.shanebeestudios.vf.api.RecipeManager;
-import com.shanebeestudios.vf.api.TileManager;
+import com.shanebeestudios.vf.api.manager.TileManager;
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
-import com.shanebeestudios.vf.api.recipe.Fuel;
+import com.shanebeestudios.vf.api.recipe.BrewingFuel;
+import com.shanebeestudios.vf.api.recipe.BrewingRecipe;
+import com.shanebeestudios.vf.api.recipe.FurnaceFuel;
 import com.shanebeestudios.vf.api.recipe.FurnaceRecipe;
-import com.shanebeestudios.vf.api.task.FurnaceTick;
 import com.shanebeestudios.vf.api.util.Util;
 import com.shanebeestudios.vf.command.FurnaceCommand;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -23,6 +29,7 @@ public class VirtualFurnace extends JavaPlugin {
     private VirtualFurnaceAPI virtualFurnaceAPI;
     private RecipeManager recipeManager;
     private FurnaceManager furnaceManager;
+    private BrewerManager brewerManager;
     private TileManager tileManager;
 
     // If ran as a Bukkit plugin, load the plugin
@@ -40,6 +47,7 @@ public class VirtualFurnace extends JavaPlugin {
         }
         this.recipeManager = virtualFurnaceAPI.getRecipeManager();
         this.furnaceManager = virtualFurnaceAPI.getFurnaceManager();
+        this.brewerManager = virtualFurnaceAPI.getBrewerManager();
         this.tileManager = virtualFurnaceAPI.getTileManager();
 
         registerCommands();
@@ -82,12 +90,25 @@ public class VirtualFurnace extends JavaPlugin {
         for (FurnaceRecipe recipe : FurnaceRecipe.getVanillaFurnaceRecipes()) {
             this.recipeManager.registerFurnaceRecipe(recipe);
         }
+        for (BrewingRecipe recipe : BrewingRecipe.getVanillaBrewingRecipes()) {
+            this.recipeManager.registerBrewingRecipe(recipe);
+        }
+
+        ItemStack ing = new ItemStack(Material.GLOWSTONE_DUST);
+        ItemStack in = new ItemBuilder(Material.POTATO, 1).build();
+        ItemStack out = new ItemBuilder(Material.BAKED_POTATO).name("&aGlowing Potato").addEnchant(Enchantment.DAMAGE_ALL, 1).hideEnchants().build();
+
+        BrewingRecipe rec = new BrewingRecipe(Util.getKey("potato_glow"), ing, in, out, 400);
+        this.recipeManager.registerBrewingRecipe(rec);
     }
 
     private void registerFuels() {
-        for (Fuel fuel : Fuel.getVanillaFuels()) {
-            this.recipeManager.registerFuel(fuel);
+        for (FurnaceFuel furnaceFuel : FurnaceFuel.getVanillaFurnaceFuels()) {
+            this.recipeManager.registerFuel(furnaceFuel);
         }
+        this.recipeManager.registerFuel(new FurnaceFuel(Util.getKey("test_diamond"), Material.DIAMOND, 200));
+        this.recipeManager.registerFuel(new FurnaceFuel(Util.getKey("test_snowball"), Material.SNOWBALL, 30));
+        this.recipeManager.registerBrewingFuel(BrewingFuel.BLAZE_POWDER);
     }
 
     /**
@@ -115,6 +136,10 @@ public class VirtualFurnace extends JavaPlugin {
      */
     public FurnaceManager getFurnaceManager() {
         return furnaceManager;
+    }
+
+    public BrewerManager getBrewerManager() {
+        return brewerManager;
     }
 
     /**

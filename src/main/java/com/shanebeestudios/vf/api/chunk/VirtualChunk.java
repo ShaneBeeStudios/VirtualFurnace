@@ -2,6 +2,7 @@ package com.shanebeestudios.vf.api.chunk;
 
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import com.shanebeestudios.vf.api.tile.Tile;
+import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -232,8 +233,10 @@ public class VirtualChunk {
      * <p><b>NOTE:</b> This should only be used internally.</p>
      */
     public void tick() {
-        for (Tile<?> tile : tiles) {
-            tile.tick();
+        if (isBukkitChunkLoaded() || isForceLoaded()) {
+            for (Tile<?> tile : tiles) {
+                tile.tick();
+            }
         }
     }
 

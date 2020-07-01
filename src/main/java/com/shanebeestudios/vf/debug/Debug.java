@@ -1,12 +1,13 @@
 package com.shanebeestudios.vf.debug;
 
 import com.shanebeestudios.vf.VirtualFurnace;
-import com.shanebeestudios.vf.api.TileManager;
+import com.shanebeestudios.vf.api.manager.TileManager;
 import com.shanebeestudios.vf.api.chunk.VirtualChunk;
 import com.shanebeestudios.vf.api.machine.Furnace;
 import com.shanebeestudios.vf.api.tile.FurnaceTile;
 import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -62,7 +63,8 @@ public class Debug {
                         furnace.setFuel(new ItemStack(Material.COAL, 64));
                         furnace.setInput(new ItemStack(Material.CHICKEN, 64));
                         FurnaceTile furnaceTile = tileManager.createFurnaceTile(x << 4, 1, z << 4, world, furnace);
-                        VirtualChunk virtualChunk = tileManager.getChunk(furnaceTile.getBlock().getChunk());
+                        Chunk chunk = furnaceTile.getBlock().getChunk();
+                        VirtualChunk virtualChunk = tileManager.getChunk(chunk.getX(), chunk.getZ());
                         tileManager.loadChunk(virtualChunk);
                         virtualChunk.addPluginChunkTicket(plugin);
                     }
