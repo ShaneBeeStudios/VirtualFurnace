@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -332,6 +333,8 @@ public class FurnaceManager {
     public void saveConfig() {
         try {
             furnaceConfig.save(furnaceFile);
+        } catch (ConcurrentModificationException ignore) {
+            // TODO figure out a proper way to handle this exception and figure out why its happening
         } catch (IOException e) {
             e.printStackTrace();
         }
