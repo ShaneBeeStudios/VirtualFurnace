@@ -10,6 +10,7 @@ import com.shanebeestudios.vf.api.recipe.Fuel;
 import com.shanebeestudios.vf.api.recipe.FurnaceRecipe;
 import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -283,7 +284,13 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         FurnaceRecipe result = this.recipeManager.getByIngredient(this.input.getType());
         if (result == null) return false;
         this.cookTimeTotal = (int) (result.getCookTime() / furnaceProperties.getCookMultiplier());
-        return this.output == null || this.output.getType() == result.getResult();
+        if (this.output == null) return true;
+
+        Material type = this.output.getType();
+        if (type == result.getResult()) {
+            return this.output.getAmount() < type.getMaxStackSize();
+        }
+        return false;
     }
 
     private void processCook() {
