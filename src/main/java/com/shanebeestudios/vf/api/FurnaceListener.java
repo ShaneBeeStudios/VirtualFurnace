@@ -125,7 +125,7 @@ class FurnaceListener implements Listener {
 
     private boolean isNotVanillaFuel(ItemStack itemStack) {
         for (Fuel fuel : Fuel.getVanillaFuels()) {
-            if (fuel.getFuel() == itemStack.getType()) {
+            if (fuel.getFuelMaterial() == itemStack.getType()) {
                 return false;
             }
         }

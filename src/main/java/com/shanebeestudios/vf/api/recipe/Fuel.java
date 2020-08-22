@@ -5,6 +5,7 @@ import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -169,8 +170,20 @@ public class Fuel implements Keyed {
      * Get the material of this fuel
      *
      * @return Material of fuel (null if non-existent)
+     * @deprecated Use {@link #getFuelMaterial()} instead
+     * <p>Will be working on using {@link ItemStack ItemStacks} for recipes in the future</p>
      */
+    @Deprecated
     public Material getFuel() {
+        return this.material;
+    }
+
+    /**
+     * Get the {@link Material} of this fuel
+     *
+     * @return Material of fuel (null if non-existent)
+     */
+    public Material getFuelMaterial() {
         return this.material;
     }
 

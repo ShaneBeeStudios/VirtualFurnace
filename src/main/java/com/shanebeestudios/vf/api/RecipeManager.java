@@ -98,7 +98,7 @@ public class RecipeManager {
      */
     public FurnaceRecipe getByIngredient(Material ingredient) {
         for (FurnaceRecipe recipe : this.furnaceRecipeMap.values()) {
-            if (recipe.getIngredient() == ingredient) {
+            if (recipe.getIngredientType() == ingredient) {
                 return recipe;
             }
         }

@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.BlastingRecipe;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.SmokingRecipe;
 
 import java.util.ArrayList;
@@ -108,8 +109,20 @@ public class FurnaceRecipe extends Recipe {
      * Get the ingredient of this recipe
      *
      * @return Ingredient of this recipe
+     * @deprecated Use {@link #getIngredientType()} instead
+     * <p>Will be working on using {@link ItemStack ItemStacks} for recipes in the future</p>
      */
+    @Deprecated
     public Material getIngredient() {
+        return this.ingredient;
+    }
+
+    /**
+     * Get the ingredient {@link Material} of this recipe
+     *
+     * @return Ingredient Material of this recipe
+     */
+    public Material getIngredientType() {
         return this.ingredient;
     }
 

@@ -287,7 +287,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         if (this.output == null) return true;
 
         Material type = this.output.getType();
-        if (type == result.getResult()) {
+        if (type == result.getResultType()) {
             return this.output.getAmount() < type.getMaxStackSize();
         }
         return false;
@@ -298,7 +298,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         if (result == null) return;
         ItemStack out;
         if (this.output == null) {
-            out = new ItemStack(result.getResult());
+            out = new ItemStack(result.getResultType());
         } else {
             out = this.output.clone();
             out.setAmount(out.getAmount() + 1);
