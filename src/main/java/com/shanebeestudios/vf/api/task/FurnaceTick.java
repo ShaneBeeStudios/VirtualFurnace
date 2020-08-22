@@ -43,8 +43,8 @@ public class FurnaceTick extends BukkitRunnable {
         }
         tick++;
         if (tick >= 6000) {
-            this.furnaceManager.saveAll();
             this.tick = 0;
+            this.furnaceManager.saveAll();
         }
     }
 

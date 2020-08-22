@@ -40,8 +40,8 @@ public class TileTick extends BukkitRunnable {
         }
         tick++;
         if (tick >= 6000) {
-            this.tileManager.saveAllTiles();
             this.tick = 0;
+            this.tileManager.saveAllTiles();
         }
         running = false;
     }
