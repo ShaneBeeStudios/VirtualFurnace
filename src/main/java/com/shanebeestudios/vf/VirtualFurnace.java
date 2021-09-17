@@ -10,6 +10,7 @@ import com.shanebeestudios.vf.api.task.FurnaceTick;
 import com.shanebeestudios.vf.api.util.Util;
 import com.shanebeestudios.vf.command.FurnaceCommand;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -88,6 +89,10 @@ public class VirtualFurnace extends JavaPlugin {
         for (Fuel fuel : Fuel.getVanillaFuels()) {
             this.recipeManager.registerFuel(fuel);
         }
+
+        // test custom fuels
+        Fuel goldF = new Fuel(Util.getKey("gold_fuel"), Material.GOLD_INGOT, 800);
+        this.recipeManager.registerFuel(goldF);
     }
 
     /**
