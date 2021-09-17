@@ -16,7 +16,6 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +29,7 @@ import java.util.UUID;
  * Virtual furnace object
  */
 @SuppressWarnings("unused")
-public class Furnace extends Machine implements PropertyHolder<FurnaceProperties>, InventoryHolder, ConfigurationSerializable {
+public class Furnace extends Machine implements PropertyHolder<FurnaceProperties>, ConfigurationSerializable {
 
     private final FurnaceProperties furnaceProperties;
     private final RecipeManager recipeManager;
@@ -75,7 +74,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         this.fuel = null;
         this.input = null;
         this.output = null;
-        this.inventory = Bukkit.createInventory(this, InventoryType.FURNACE, Util.getColString(name));
+        this.inventory = Bukkit.createInventory(null, InventoryType.FURNACE, Util.getColString(name));
         this.experience = 0.0f;
         this.updateInventory();
     }
@@ -104,7 +103,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
             this.fuelTimeTotal = 0;
         }
         this.experience = xp;
-        this.inventory = Bukkit.createInventory(this, InventoryType.FURNACE, Util.getColString(name));
+        this.inventory = Bukkit.createInventory(null, InventoryType.FURNACE, Util.getColString(name));
         this.updateInventory();
     }
 
