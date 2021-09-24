@@ -88,6 +88,8 @@
             <id>maven-ftp-repo</id>
             <name>VirtualFurnaceAPI Repo</name>
             <url>ftp://maven.shanebeestudios.com</url>
+            <!-- DEAR SHANE: IF THIS DOESN'T WORK, USE WEBSITE IP INSTEAD -->
+            <!-- ALSO DON'T PUSH THAT TO GITHUB -->
         </repository>
     </distributionManagement>
 
