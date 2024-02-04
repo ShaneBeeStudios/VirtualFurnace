@@ -1,8 +1,8 @@
 package com.shanebeestudios.vf.api.event.machine;
 
-import com.shanebeestudios.vf.api.event.Event;
 import com.shanebeestudios.vf.api.machine.Furnace;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;

@@ -1,7 +1,7 @@
 package com.shanebeestudios.vf.api.machine;
 
-import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryHolder;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -10,7 +10,7 @@ import java.util.UUID;
  * Abstract machine class
  * <p>Other machines will extend from this class</p>
  */
-public abstract class Machine {
+public abstract class Machine implements InventoryHolder {
 
     private final String name;
     private final UUID uniqueID;

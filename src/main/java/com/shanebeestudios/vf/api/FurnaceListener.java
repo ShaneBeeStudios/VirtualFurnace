@@ -3,7 +3,6 @@ package com.shanebeestudios.vf.api;
 import com.shanebeestudios.vf.api.chunk.VirtualChunk;
 import com.shanebeestudios.vf.api.event.machine.FurnaceExtractEvent;
 import com.shanebeestudios.vf.api.machine.Furnace;
-import com.shanebeestudios.vf.api.machine.Machine;
 import com.shanebeestudios.vf.api.recipe.Fuel;
 import com.shanebeestudios.vf.api.tile.Tile;
 import org.bukkit.Chunk;
@@ -14,7 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
@@ -22,16 +20,11 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
-
 class FurnaceListener implements Listener {
 
     private final FurnaceManager furnaceManager;
     private final RecipeManager recipeManager;
     private final TileManager tileManager;
-
-    private final Map<HumanEntity, Machine> openInventories = new HashMap<>();
 
     FurnaceListener(VirtualFurnaceAPI virtualFurnaceAPI) {
         this.furnaceManager = virtualFurnaceAPI.getFurnaceManager();
@@ -51,7 +44,6 @@ class FurnaceListener implements Listener {
             if (furnace != null) {
                 event.setCancelled(true);
                 furnace.openInventory(player);
-                openInventories.put(player, furnace);
                 return;
             }
         }
@@ -66,24 +58,16 @@ class FurnaceListener implements Listener {
                 event.setCancelled(true);
                 if (event.getHand() != EquipmentSlot.OFF_HAND) {
                     tile.activate(player);
-                    openInventories.put(player, tile.getMachine());
                 }
             }
         }
     }
 
-    @EventHandler
-    private void onCloseInventory(InventoryCloseEvent event) {
-        HumanEntity player = event.getPlayer();
-        openInventories.remove(player);
-
-    }
 
     @EventHandler
     private void onInventoryClick(InventoryClickEvent event) {
         HumanEntity clicker = event.getWhoClicked();
-        if (openInventories.containsKey(clicker) && clicker instanceof Player) {
-            Furnace furnace = (Furnace) openInventories.get(clicker); // TODO This may change in the future
+        if (event.getInventory().getHolder() instanceof Furnace furnace && clicker instanceof Player player) {
             int slot = event.getRawSlot();
             // Give XP to player when they extract from the furnace
             if (slot == 2) {
@@ -91,7 +75,7 @@ class FurnaceListener implements Listener {
                 if (output != null) {
                     int exp = (int) furnace.extractExperience();
                     // Call the furnace extract event
-                    FurnaceExtractEvent extractEvent = new FurnaceExtractEvent(furnace, ((Player) clicker), output, exp);
+                    FurnaceExtractEvent extractEvent = new FurnaceExtractEvent(furnace, player, output, exp);
                     extractEvent.callEvent();
 
                     ((Player) clicker).giveExp(extractEvent.getExperience());
