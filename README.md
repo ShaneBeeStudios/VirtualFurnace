@@ -14,6 +14,10 @@ As a plugin, VirtualFurnace currently doesn't have much to offer. You can give p
 ## API
 As an API, VirtualFurnace allows you to integrate virtual furnaces into your plugin and use them however you wish.
 
+## Requirements
+- Java 17+
+- PaperMC Server (or a fork of)
+
 ## JavaDocs
 The API has [**JAVADOCS**](https://shanebeestudios.com/docs/plugins/VirtualFurnace/)
 
