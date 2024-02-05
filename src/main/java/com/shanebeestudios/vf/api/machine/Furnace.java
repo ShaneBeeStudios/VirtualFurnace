@@ -40,7 +40,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
     private int cookTimeTotal;
     private int fuelTime;
     private int fuelTimeTotal;
-    private final Inventory inventory;
+    private Inventory inventory;
     private float experience;
 
     /**
@@ -109,6 +109,24 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         this.updateInventory();
     }
 
+    /**
+     * Set the name of this furnace
+     * <p>This will force close all open inventory views.</p>
+     *
+     * @param name new name
+     */
+    @SuppressWarnings("deprecation") // Paper deprecation for AdventureAPI
+    @Override
+    public void setName(String name) {
+        super.setName(name);
+        // Close inventory views to prevent issues when creating new inventory
+        for (HumanEntity viewer : this.inventory.getViewers()) {
+            viewer.closeInventory();
+        }
+        // since we can't change the name of an inventory, we create a new one
+        this.inventory = Bukkit.createInventory(this, InventoryType.FURNACE, Util.getColString(name));
+        updateInventory();
+    }
 
     /**
      * Get the properties associated with this furnace

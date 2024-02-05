@@ -12,8 +12,8 @@ import java.util.UUID;
  */
 public abstract class Machine implements InventoryHolder {
 
-    private final String name;
     private final UUID uniqueID;
+    private String name;
 
     Machine(UUID uniqueID, String name) {
         this.uniqueID = uniqueID;
@@ -36,6 +36,15 @@ public abstract class Machine implements InventoryHolder {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Set the name of this machine
+     *
+     * @param name new name
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
