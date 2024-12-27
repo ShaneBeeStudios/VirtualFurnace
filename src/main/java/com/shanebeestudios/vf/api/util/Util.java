@@ -6,6 +6,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 
+import java.lang.reflect.Method;
+
 public class Util {
 
     private static final String PREFIX = "&7[&bVirtual&3Furnace&7] ";
@@ -104,6 +106,26 @@ public class Util {
             Class.forName(className);
             return true;
         } catch (ClassNotFoundException ex) {
+            return false;
+        }
+    }
+
+    // Copied from SkriptLang/Skript
+    public static boolean methodExists(Class<?> c, String methodName, Class<?>... paramTypes) {
+        try {
+            c.getDeclaredMethod(methodName, paramTypes);
+            return true;
+        } catch (NoSuchMethodException | SecurityException ignore) {
+            return false;
+        }
+    }
+
+    // Copied from SkriptLang/Skript
+    public static boolean methodExists(Class<?> c, String methodName, Class<?>[] paramTypes, Class<?> returnType) {
+        try {
+            Method m = c.getDeclaredMethod(methodName, paramTypes);
+            return m.getReturnType() == returnType;
+        } catch (NoSuchMethodException | SecurityException ignore) {
             return false;
         }
     }
