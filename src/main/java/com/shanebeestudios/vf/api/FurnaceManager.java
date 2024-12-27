@@ -1,6 +1,7 @@
 package com.shanebeestudios.vf.api;
 
 import com.shanebeestudios.vf.api.machine.Furnace;
+import com.shanebeestudios.vf.api.machine.Machine;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
 import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Material;
@@ -19,16 +20,18 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * Manager for {@link Furnace Furnaces}
+ * Manager for {@link Machine Machines}
  * <p>You can get an instance of this class from <b>{@link VirtualFurnaceAPI#getFurnaceManager()}</b></p>
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
@@ -41,35 +44,52 @@ public class FurnaceManager {
     private static final @NotNull Enchantment INFINITY = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("infinity"));
 
     private final VirtualFurnaceAPI virtualFurnaceAPI;
-    private File furnaceFile;
-    private FileConfiguration furnaceConfig;
-    private final Map<UUID, Furnace> furnaceMap;
+    private File machineFile;
+    private FileConfiguration machineConfig;
+    private final Map<UUID, Machine> machineMap;
     private final NamespacedKey key;
 
     FurnaceManager(VirtualFurnaceAPI virtualFurnaceAPI) {
         this.virtualFurnaceAPI = virtualFurnaceAPI;
-        this.furnaceMap = new HashMap<>();
+        this.machineMap = new HashMap<>();
         this.key = new NamespacedKey(virtualFurnaceAPI.getJavaPlugin(), "furnaceID");
         loadFurnaceConfig();
     }
 
     /**
-     * Get a collection of all {@link Furnace}s
+     * Get a collection of all {@link Furnace Furnaces}
      *
      * @return Collection of all furnaces
+     * @deprecated Use {@link #getAllMachines()} instead
      */
+    @Deprecated
     public Collection<Furnace> getAllFurnaces() {
-        return Collections.unmodifiableCollection(this.furnaceMap.values());
+        List<Furnace> furnaces = new ArrayList<>();
+        for (Machine value : this.machineMap.values()) {
+            if (value instanceof Furnace furnace) {
+                furnaces.add(furnace);
+            }
+        }
+        return furnaces;
     }
 
     /**
-     * Get a {@link Furnace} by ID
+     * Get a collection of all {@link Machine Machines}
      *
-     * @param uuid ID of furnace to grab
-     * @return Furnace from ID (null if a furnace with this ID does not exist)
+     * @return Collection of all machines
      */
-    public Furnace getByID(@NotNull UUID uuid) {
-        return this.furnaceMap.get(uuid);
+    public Collection<Machine> getAllMachines() {
+        return Collections.unmodifiableCollection(this.machineMap.values());
+    }
+
+    /**
+     * Get a {@link Machine} by ID
+     *
+     * @param uuid ID of machine to grab
+     * @return Machine from ID (null if a machine with this ID does not exist)
+     */
+    public Machine getByID(@NotNull UUID uuid) {
+        return this.machineMap.get(uuid);
     }
 
     /**
@@ -123,7 +143,7 @@ public class FurnaceManager {
         if (function != null) {
             function.accept(furnace);
         }
-        this.furnaceMap.put(furnace.getUniqueID(), furnace);
+        this.machineMap.put(furnace.getUniqueID(), furnace);
         saveFurnace(furnace, true);
         return furnace;
     }
@@ -238,12 +258,14 @@ public class FurnaceManager {
         if (glowing) {
             if (HAS_GLINT) {
                 meta.setEnchantmentGlintOverride(true);
-            } else if (item.getType() == Material.ARROW) {
-                meta.addEnchant(SHARPNESS, 1, true);
             } else {
-                meta.addEnchant(INFINITY, 1, true);
+                if (item.getType() == Material.ARROW) {
+                    meta.addEnchant(SHARPNESS, 1, true);
+                } else {
+                    meta.addEnchant(INFINITY, 1, true);
+                }
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             }
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
         Furnace furnace;
         if (function == null) {
@@ -261,8 +283,27 @@ public class FurnaceManager {
      *
      * @param itemStack ItemStack to grab furnace from
      * @return Furnace if the ItemStack has one assigned to it else null
+     * @deprecated Use {@link #getMachineFromItemStack(ItemStack)} instead
      */
+    @Deprecated
     public Furnace getFurnaceFromItemStack(@NotNull ItemStack itemStack) {
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta != null && meta.getPersistentDataContainer().has(this.key, PersistentDataType.STRING)) {
+            String u = meta.getPersistentDataContainer().get(this.key, PersistentDataType.STRING);
+            if (u == null) return null;
+            Machine machine = getByID(UUID.fromString(u));
+            if (machine instanceof Furnace furnace) return furnace;
+        }
+        return null;
+    }
+
+    /**
+     * Get a {@link Machine} from an {@link ItemStack}
+     *
+     * @param itemStack ItemStack to grab machine from
+     * @return Machine if the ItemStack has one assigned to it else null
+     */
+    public Machine getMachineFromItemStack(@NotNull ItemStack itemStack) {
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null && meta.getPersistentDataContainer().has(this.key, PersistentDataType.STRING)) {
             String u = meta.getPersistentDataContainer().get(this.key, PersistentDataType.STRING);
@@ -273,64 +314,76 @@ public class FurnaceManager {
     }
 
     private void loadFurnaceConfig() {
-        if (this.furnaceFile == null) {
-            this.furnaceFile = new File(this.virtualFurnaceAPI.getJavaPlugin().getDataFolder(), "furnaces.yml");
+        if (this.machineFile == null) {
+            this.machineFile = new File(this.virtualFurnaceAPI.getJavaPlugin().getDataFolder(), "furnaces.yml");
         }
-        if (!furnaceFile.exists()) {
+        if (!machineFile.exists()) {
             this.virtualFurnaceAPI.getJavaPlugin().saveResource("furnaces.yml", false);
         }
-        this.furnaceConfig = YamlConfiguration.loadConfiguration(this.furnaceFile);
+        this.machineConfig = YamlConfiguration.loadConfiguration(this.machineFile);
         loadFurnaces();
     }
 
     void loadFurnaces() {
-        ConfigurationSection section = this.furnaceConfig.getConfigurationSection("furnaces");
+        ConfigurationSection section = this.machineConfig.getConfigurationSection("furnaces");
         if (section != null) {
             for (String string : section.getKeys(true)) {
                 if (section.get(string) instanceof Furnace furnace) {
-                    this.furnaceMap.put(UUID.fromString(string), (Furnace) section.get(string));
+                    this.machineMap.put(UUID.fromString(string), furnace);
                 }
             }
         }
-        Util.log("Loaded: &b" + this.furnaceMap.size() + "&7 furnaces");
+        Util.log("Loaded: &b" + this.machineMap.size() + "&7 furnaces");
     }
 
     /**
-     * Save a furnace to YAML storage
+     * Save a machine to YAML storage
      * <p><b>NOTE:</b> If choosing not to save to file, this change will not take effect
      * in the YAML file, this may be useful for saving a large batch and saving file at the
      * end of the batch change, use {@link #saveConfig()} to save all changes to file</p>
      *
-     * @param furnace    Furnace to save
+     * @param machine    Machine to save
      * @param saveToFile Whether to save to file
      */
-    public void saveFurnace(@NotNull Furnace furnace, boolean saveToFile) {
-        this.furnaceConfig.set("furnaces." + furnace.getUniqueID(), furnace);
+    public void saveFurnace(@NotNull Machine machine, boolean saveToFile) {
+        this.machineConfig.set("furnaces." + machine.getUniqueID(), machine);
         if (saveToFile)
             saveConfig();
     }
 
     /**
-     * Remove a furnace from YAML storage
+     * Remove a machine from YAML storage
      * <p><b>NOTE:</b> If choosing not to save to file, this change will not take effect
-     * in the YAML file, this may be useful it removing a large batch and saving file at the
+     * in the YAML file, this may be useful if removing a large batch and saving file at the
      * end of the batch change, use {@link #saveConfig()} to save all changes to file</p>
      *
-     * @param furnace    Furnace to remove
+     * @param machine    Machine to remove
      * @param saveToFile Whether to save changes to file
      */
-    public void removeFurnaceFromConfig(@NotNull Furnace furnace, boolean saveToFile) {
-        this.furnaceConfig.set("furnaces." + furnace.getUniqueID(), null);
+    public void removeFurnaceFromConfig(@NotNull Machine machine, boolean saveToFile) {
+        this.machineConfig.set("furnaces." + machine.getUniqueID(), null);
         if (saveToFile)
             saveConfig();
+    }
+
+    /**
+     * Remove a {@link Machine}
+     * <p>This will remove from memory and from file (if saving is true)
+     *
+     * @param machine    Machine to remove
+     * @param saveToFile Whether to save to file
+     */
+    public void removeMachine(@NotNull Machine machine, boolean saveToFile) {
+        this.machineMap.remove(machine.getUniqueID());
+        removeFurnaceFromConfig(machine, saveToFile);
     }
 
     /**
      * Save all furnaces to file
      */
     public void saveAll() {
-        for (Furnace furnace : this.furnaceMap.values()) {
-            saveFurnace(furnace, false);
+        for (Machine machine : this.machineMap.values()) {
+            saveFurnace(machine, false);
         }
         saveConfig();
     }
@@ -341,7 +394,7 @@ public class FurnaceManager {
     @SuppressWarnings("CallToPrintStackTrace")
     public void saveConfig() {
         try {
-            furnaceConfig.save(furnaceFile);
+            machineConfig.save(machineFile);
         } catch (ConcurrentModificationException ignore) {
             // TODO figure out a proper way to handle this exception and figure out why its happening
         } catch (IOException e) {
@@ -351,7 +404,7 @@ public class FurnaceManager {
 
     void shutdown() {
         saveAll();
-        furnaceMap.clear();
+        machineMap.clear();
     }
 
 }

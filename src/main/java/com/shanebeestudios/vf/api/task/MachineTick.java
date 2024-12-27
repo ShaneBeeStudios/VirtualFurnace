@@ -2,15 +2,15 @@ package com.shanebeestudios.vf.api.task;
 
 import com.shanebeestudios.vf.api.FurnaceManager;
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
-import com.shanebeestudios.vf.api.machine.Furnace;
+import com.shanebeestudios.vf.api.machine.Machine;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 /**
- * Timer for ticking furnaces
+ * Timer for ticking {@link Machine Machines}
  */
-public class FurnaceTick extends BukkitRunnable {
+public class MachineTick extends BukkitRunnable {
 
     private final FurnaceManager furnaceManager;
     private final VirtualFurnaceAPI virtualFurnaceAPI;
@@ -18,7 +18,7 @@ public class FurnaceTick extends BukkitRunnable {
     private int id;
     private boolean running;
 
-    public FurnaceTick(VirtualFurnaceAPI virtualFurnaceAPI) {
+    public MachineTick(VirtualFurnaceAPI virtualFurnaceAPI) {
         this.virtualFurnaceAPI = virtualFurnaceAPI;
         this.furnaceManager = virtualFurnaceAPI.getFurnaceManager();
         this.tick = 0;
@@ -33,11 +33,11 @@ public class FurnaceTick extends BukkitRunnable {
     public void run() {
         running = true;
         try {
-            for (Furnace furnace : furnaceManager.getAllFurnaces()) {
+            for (Machine machine : furnaceManager.getAllMachines()) {
                 if (!running) {
                     return;
                 }
-                furnace.tick();
+                machine.tick();
             }
         } catch (Exception ignore) {
         }

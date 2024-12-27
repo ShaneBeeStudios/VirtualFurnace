@@ -3,6 +3,7 @@ package com.shanebeestudios.vf.api;
 import com.shanebeestudios.vf.api.chunk.VirtualChunk;
 import com.shanebeestudios.vf.api.event.machine.FurnaceExtractEvent;
 import com.shanebeestudios.vf.api.machine.Furnace;
+import com.shanebeestudios.vf.api.machine.Machine;
 import com.shanebeestudios.vf.api.recipe.Fuel;
 import com.shanebeestudios.vf.api.tile.Tile;
 import org.bukkit.Chunk;
@@ -40,10 +41,10 @@ class FurnaceListener implements Listener {
         ItemStack hand = event.getItem();
         Player player = event.getPlayer();
         if (hand != null) {
-            Furnace furnace = this.furnaceManager.getFurnaceFromItemStack(hand);
-            if (furnace != null) {
+            Machine machine = this.furnaceManager.getMachineFromItemStack(hand);
+            if (machine != null) {
                 event.setCancelled(true);
-                furnace.openInventory(player);
+                machine.openInventory(player);
                 return;
             }
         }

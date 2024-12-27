@@ -1,11 +1,13 @@
 package com.shanebeestudios.vf.command;
 
-import com.shanebeestudios.vf.api.FurnaceManager;
 import com.shanebeestudios.vf.VirtualFurnace;
+import com.shanebeestudios.vf.api.FurnaceManager;
 import com.shanebeestudios.vf.api.TileManager;
+import com.shanebeestudios.vf.api.machine.Furnace;
+import com.shanebeestudios.vf.api.machine.Machine;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
-import com.shanebeestudios.vf.debug.Debug;
 import com.shanebeestudios.vf.api.util.Util;
+import com.shanebeestudios.vf.debug.Debug;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,7 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
-import com.shanebeestudios.vf.api.machine.Furnace;
 
 import java.util.UUID;
 
@@ -34,8 +35,7 @@ public class FurnaceCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String s, @NotNull String[] args) {
-        if (sender instanceof Player) {
-            Player player = ((Player) sender);
+        if (sender instanceof Player player) {
             if (args.length >= 1) {
                 switch (args[0]) {
                     case "new":
@@ -51,14 +51,14 @@ public class FurnaceCommand implements CommandExecutor {
                     case "open":
                         if (args.length == 2) {
                             UUID uuid = UUID.fromString(args[1]);
-                            Furnace furnace1 = this.furnaceManager.getByID(uuid);
-                            if (furnace1 != null) {
-                                furnace1.openInventory(player);
+                            Machine machine = this.furnaceManager.getByID(uuid);
+                            if (machine != null) {
+                                machine.openInventory(player);
                             } else {
                                 player.sendMessage("FURNACE NOT FOUND!");
                             }
                         } else {
-                            sender.sendMessage("Please enter an ID of a furnace to open");
+                            sender.sendMessage("Please enter an ID of a machine to open");
                         }
                         break;
                     case "item":
@@ -82,7 +82,7 @@ public class FurnaceCommand implements CommandExecutor {
                                 assert smokerMeta != null;
                                 smokerMeta.setDisplayName(Util.getColString(smokerName));
                                 smokerItem.setItemMeta(smokerMeta);
-                                player.getInventory().addItem(this.furnaceManager.createItemWithFurnace(smokerName, FurnaceProperties.SMOKER,smokerItem, true));
+                                player.getInventory().addItem(this.furnaceManager.createItemWithFurnace(smokerName, FurnaceProperties.SMOKER, smokerItem, true));
 
                                 ItemStack fastItem = new ItemStack(Material.BLAST_FURNACE);
                                 String fastName = "&6Fast Food";
@@ -102,9 +102,9 @@ public class FurnaceCommand implements CommandExecutor {
                         break;
                     case "id":
                         ItemStack item = player.getInventory().getItemInMainHand();
-                        Furnace furnace = this.furnaceManager.getFurnaceFromItemStack(item);
-                        if (furnace != null) {
-                            player.sendMessage("Portable furnace ID: " + furnace.getUniqueID().toString());
+                        Machine machine = this.furnaceManager.getMachineFromItemStack(item);
+                        if (machine != null) {
+                            player.sendMessage("Portable machine ID: " + machine.getUniqueID().toString());
                         } else {
                             player.sendMessage("This item has no ID!");
                         }
@@ -129,14 +129,14 @@ public class FurnaceCommand implements CommandExecutor {
                         debug.loadDebugTiles(amount);
                         break;
                     case "check":
-                        int furnaces = furnaceManager.getAllFurnaces().size();
+                        int machines = furnaceManager.getAllMachines().size();
                         int tiles = tileManager.getAllTiles().size();
                         int chunks = tileManager.getChunks().size();
                         int loadedChunks = tileManager.getLoadedChunks().size();
                         Util.log("&dCheck:");
                         Util.log(" - Chunks: &b" + loadedChunks + "/" + chunks);
                         Util.log(" - Tiles: &a" + tiles);
-                        Util.log(" - Furnaces: &c" + furnaces);
+                        Util.log(" - Machines: &c" + machines);
 
                 }
             }
