@@ -62,7 +62,7 @@ public class FurnaceManager {
      * @return Collection of all furnaces
      * @deprecated Use {@link #getAllMachines()} instead
      */
-    @Deprecated
+    @Deprecated(since = "1.1.0")
     public Collection<Furnace> getAllFurnaces() {
         List<Furnace> furnaces = new ArrayList<>();
         for (Machine value : this.machineMap.values()) {
@@ -285,7 +285,7 @@ public class FurnaceManager {
      * @return Furnace if the ItemStack has one assigned to it else null
      * @deprecated Use {@link #getMachineFromItemStack(ItemStack)} instead
      */
-    @Deprecated
+    @Deprecated(since = "1.1.0")
     public Furnace getFurnaceFromItemStack(@NotNull ItemStack itemStack) {
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null && meta.getPersistentDataContainer().has(this.key, PersistentDataType.STRING)) {
