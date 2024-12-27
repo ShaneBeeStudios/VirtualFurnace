@@ -2,7 +2,7 @@ package com.shanebeestudios.vf.api;
 
 import com.shanebeestudios.vf.api.machine.Furnace;
 import com.shanebeestudios.vf.api.property.FurnaceProperties;
-import com.shanebeestudios.vf.api.task.FurnaceTick;
+import com.shanebeestudios.vf.api.task.MachineTick;
 import com.shanebeestudios.vf.api.task.TileTick;
 import com.shanebeestudios.vf.api.tile.FurnaceTile;
 import com.shanebeestudios.vf.api.util.Util;
@@ -34,7 +34,7 @@ public class VirtualFurnaceAPI {
     private RecipeManager recipeManager;
     private FurnaceManager furnaceManager;
     private TileManager tileManager;
-    private FurnaceTick furnaceTick;
+    private MachineTick machineTick;
     private TileTick tileTick;
 
     /**
@@ -62,7 +62,7 @@ public class VirtualFurnaceAPI {
             this.recipeManager = null;
             this.furnaceManager = null;
             this.tileManager = null;
-            this.furnaceTick = null;
+            this.machineTick = null;
             this.tileTick = null;
             Util.error("&cFailed to initialize VirtualFurnaceAPI");
             Util.error("&7  - Bukkit version: &b" + Bukkit.getBukkitVersion() + " &7is not supported!");
@@ -76,8 +76,8 @@ public class VirtualFurnaceAPI {
         this.furnaceManager = new FurnaceManager(this);
         this.tileManager = new TileManager(this);
         this.tileManager.load();
-        this.furnaceTick = new FurnaceTick(this);
-        this.furnaceTick.start();
+        this.machineTick = new MachineTick(this);
+        this.machineTick.start();
         this.tileTick = new TileTick(this);
         this.tileTick.start();
         Bukkit.getPluginManager().registerEvents(new FurnaceListener(this), javaPlugin);
@@ -90,9 +90,9 @@ public class VirtualFurnaceAPI {
      * This should be used in a plugin's {@link Plugin#onDisable() onDisable()} method</p>
      */
     public void disableAPI() {
-        this.furnaceTick.cancel();
+        this.machineTick.cancel();
         this.tileTick.cancel();
-        this.furnaceTick = null;
+        this.machineTick = null;
         this.tileTick = null;
         this.furnaceManager.shutdown();
         this.tileManager.shutdown();
@@ -107,7 +107,7 @@ public class VirtualFurnaceAPI {
      * <p>This is good to use in your onDisable() method, to prevent tasks still running on server shutdown/reload</p>
      */
     public void disableFurnaceTick() {
-        this.furnaceTick.cancel();
+        this.machineTick.cancel();
     }
 
     /**
@@ -161,8 +161,8 @@ public class VirtualFurnaceAPI {
      *
      * @return Instance of furnace tick
      */
-    public FurnaceTick getFurnaceTick() {
-        return furnaceTick;
+    public MachineTick getFurnaceTick() {
+        return machineTick;
     }
 
     /**

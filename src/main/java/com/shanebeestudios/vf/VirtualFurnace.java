@@ -6,7 +6,6 @@ import com.shanebeestudios.vf.api.TileManager;
 import com.shanebeestudios.vf.api.VirtualFurnaceAPI;
 import com.shanebeestudios.vf.api.recipe.Fuel;
 import com.shanebeestudios.vf.api.recipe.FurnaceRecipe;
-import com.shanebeestudios.vf.api.task.FurnaceTick;
 import com.shanebeestudios.vf.api.util.Util;
 import com.shanebeestudios.vf.command.FurnaceCommand;
 import org.bukkit.Bukkit;
