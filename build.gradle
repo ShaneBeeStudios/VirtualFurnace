@@ -10,13 +10,12 @@ plugins {
 }
 
 compileJava {
-    sourceCompatibility = '17'
-    targetCompatibility = '17'
     options.encoding = 'UTF-8'
 }
 
 // VirtualFurnace version
 version = '1.0.0'
+def oldestJava = 17
 
 repositories {
     mavenCentral()
@@ -28,10 +27,14 @@ repositories {
 
 dependencies {
     // Paper
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 
     // bStats
     implementation(group: 'org.bstats', name: 'bstats-bukkit', version: '3.0.2')
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-source', '' + oldestJava, '-target', '' + oldestJava]
 }
 
 build {
