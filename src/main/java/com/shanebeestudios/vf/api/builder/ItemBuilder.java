@@ -20,6 +20,16 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 public class ItemBuilder {
 
+    private static final ItemFlag HIDE_POTIONS;
+
+    static {
+        if (Util.isRunningMinecraft(1, 20, 5)) {
+            HIDE_POTIONS = ItemFlag.HIDE_ADDITIONAL_TOOLTIP;
+        } else {
+            HIDE_POTIONS = ItemFlag.valueOf("HIDE_POTION_EFFECTS");
+        }
+    }
+
     final ItemStack itemStack;
     final ItemMeta itemMeta;
 
@@ -161,7 +171,7 @@ public class ItemBuilder {
      * @return This ItemBuilder
      */
     public ItemBuilder hidePotionEffects() {
-        itemMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+        itemMeta.addItemFlags(HIDE_POTIONS);
         return this;
     }
 

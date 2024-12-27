@@ -5,6 +5,7 @@ import com.shanebeestudios.vf.api.property.FurnaceProperties;
 import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -32,6 +33,12 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class FurnaceManager {
+
+    private static final boolean HAS_GLINT = Util.methodExists(ItemMeta.class, "getEnchantmentGlintOverride");
+    @SuppressWarnings({"deprecation", "DataFlowIssue"})
+    private static final @NotNull Enchantment SHARPNESS = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("sharpness"));
+    @SuppressWarnings({"deprecation", "DataFlowIssue"})
+    private static final @NotNull Enchantment INFINITY = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("infinity"));
 
     private final VirtualFurnaceAPI virtualFurnaceAPI;
     private File furnaceFile;
@@ -229,10 +236,12 @@ public class FurnaceManager {
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
         if (glowing) {
-            if (item.getType() == Material.ARROW) {
-                meta.addEnchant(Enchantment.DAMAGE_ALL, 1, true);
+            if (HAS_GLINT) {
+                meta.setEnchantmentGlintOverride(true);
+            } else if (item.getType() == Material.ARROW) {
+                meta.addEnchant(SHARPNESS, 1, true);
             } else {
-                meta.addEnchant(Enchantment.ARROW_INFINITE, 1, true);
+                meta.addEnchant(INFINITY, 1, true);
             }
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
