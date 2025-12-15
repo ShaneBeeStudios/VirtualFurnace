@@ -1,7 +1,7 @@
 main: com.shanebeestudios.vf.VirtualFurnace
 name: VirtualFurnace
-version: '${project.version}'
-api-version: '1.13'
+version: '$version'
+api-version: '$apiversion'
 author: ShaneBee
 
 commands:
