@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,6 +20,7 @@ import java.util.Map;
  * Represents a {@link Tile} that connects a tickable {@link Furnace} to a {@link Block}
  */
 @SuppressWarnings("unused")
+@SerializableAs("tile")
 public class FurnaceTile extends Tile<Furnace> implements ConfigurationSerializable {
 
     // TODO javadocs that point to TileManager for creation
