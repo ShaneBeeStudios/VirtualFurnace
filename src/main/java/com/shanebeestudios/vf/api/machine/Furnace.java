@@ -12,6 +12,7 @@ import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -29,11 +30,12 @@ import java.util.UUID;
  * Virtual furnace object
  */
 @SuppressWarnings("unused")
+@SerializableAs("furnace")
 public class Furnace extends Machine implements PropertyHolder<FurnaceProperties>, ConfigurationSerializable {
 
     private final FurnaceProperties furnaceProperties;
     private final RecipeManager recipeManager;
-    private ItemStack fuel;
+    private ItemStack fuelItemStack;
     private ItemStack input;
     private ItemStack output;
     private int cookTime;
@@ -72,7 +74,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         this.cookTimeTotal = 0;
         this.fuelTime = 0;
         this.fuelTimeTotal = 0;
-        this.fuel = null;
+        this.fuelItemStack = null;
         this.input = null;
         this.output = null;
         this.inventory = Bukkit.createInventory(this, InventoryType.FURNACE, Util.getColString(name));
@@ -82,12 +84,12 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
 
     // Used for deserializer
     @SuppressWarnings("deprecation") // Paper deprecation for AdventureAPI
-    private Furnace(String name, UUID uuid, int cookTime, int fuelTime, float xp, ItemStack fuel, ItemStack input, ItemStack output, FurnaceProperties furnaceProperties) {
+    private Furnace(String name, UUID uuid, int cookTime, int fuelTime, float xp, ItemStack fuelItemStack, ItemStack input, ItemStack output, FurnaceProperties furnaceProperties) {
         super(uuid, name);
         this.recipeManager = VirtualFurnaceAPI.getInstance().getRecipeManager();
         this.cookTime = cookTime;
         this.fuelTime = fuelTime;
-        this.fuel = fuel;
+        this.fuelItemStack = fuelItemStack;
         this.input = input;
         this.output = output;
         this.furnaceProperties = furnaceProperties;
@@ -98,7 +100,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         } else {
             this.cookTimeTotal = 0;
         }
-        Fuel fuelF = recipeManager.getFuelByMaterial(fuel != null ? fuel.getType() : null);
+        Fuel fuelF = recipeManager.getFuelByMaterial(fuelItemStack != null ? fuelItemStack.getType() : null);
         if (fuelF != null) {
             this.fuelTimeTotal = fuelF.getBurnTime();
         } else {
@@ -153,7 +155,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
      * @return Current fuel
      */
     public ItemStack getFuel() {
-        return fuel;
+        return fuelItemStack;
     }
 
     /**
@@ -162,7 +164,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
      * @param fuel Fuel to set
      */
     public void setFuel(ItemStack fuel) {
-        this.fuel = fuel;
+        this.fuelItemStack = fuel;
     }
 
     /**
@@ -217,7 +219,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
 
     private void updateInventory() {
         this.inventory.setItem(0, this.input);
-        this.inventory.setItem(1, this.fuel);
+        this.inventory.setItem(1, this.fuelItemStack);
         this.inventory.setItem(2, this.output);
     }
 
@@ -227,8 +229,8 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
             this.input = input;
         }
         ItemStack fuel = this.inventory.getItem(1);
-        if (this.fuel != fuel) {
-            this.fuel = fuel;
+        if (this.fuelItemStack != fuel) {
+            this.fuelItemStack = fuel;
         }
         ItemStack output = this.inventory.getItem(2);
         if (this.output != output) {
@@ -274,23 +276,23 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
     }
 
     private boolean canBurn() {
-        if (this.fuel == null) return false;
-        return this.recipeManager.getFuelByMaterial(this.fuel.getType()) != null;
+        if (this.fuelItemStack == null) return false;
+        return this.recipeManager.getFuelByMaterial(this.fuelItemStack.getType()) != null;
     }
 
     private void processBurn() {
-        Fuel fuel = this.recipeManager.getFuelByMaterial(this.fuel.getType());
+        Fuel fuel = this.recipeManager.getFuelByMaterial(this.fuelItemStack.getType());
         if (fuel == null) return;
-        FurnaceFuelBurnEvent event = new FurnaceFuelBurnEvent(this, this.fuel, fuel, fuel.getBurnTime());
+        FurnaceFuelBurnEvent event = new FurnaceFuelBurnEvent(this, this.fuelItemStack, fuel, fuel.getBurnTime());
         event.callEvent();
         if (event.isCancelled()) {
             return;
         }
-        int fuelAmount = this.fuel.getAmount();
+        int fuelAmount = this.fuelItemStack.getAmount();
         if (fuelAmount > 1) {
-            this.fuel.setAmount(fuelAmount - 1);
+            this.fuelItemStack.setAmount(fuelAmount - 1);
         } else {
-            this.fuel = null;
+            this.fuelItemStack = null;
         }
         int burn = (int) (event.getBurnTime() / furnaceProperties.getFuelMultiplier());
         this.fuelTime = burn;
@@ -347,13 +349,13 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         return cookTime == furnace.cookTime && cookTimeTotal == furnace.cookTimeTotal &&
                 fuelTime == furnace.fuelTime && fuelTimeTotal == furnace.fuelTimeTotal &&
                 Objects.equals(furnaceProperties, furnace.furnaceProperties) && Objects.equals(recipeManager, furnace.recipeManager) &&
-                Objects.equals(fuel, furnace.fuel) && Objects.equals(input, furnace.input) &&
+                Objects.equals(fuelItemStack, furnace.fuelItemStack) && Objects.equals(input, furnace.input) &&
                 Objects.equals(output, furnace.output) && Objects.equals(inventory, furnace.inventory);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(furnaceProperties, recipeManager, fuel, input, output, cookTime, cookTimeTotal, fuelTime, fuelTimeTotal, inventory);
+        return Objects.hash(furnaceProperties, recipeManager, fuelItemStack, input, output, cookTime, cookTimeTotal, fuelTime, fuelTimeTotal, inventory);
     }
 
     @Override
@@ -362,7 +364,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
                 "name='" + getName() + '\'' +
                 ", uuid=" + getUniqueID() +
                 ", properties=" + furnaceProperties +
-                ", fuel=" + fuel +
+                ", fuel=" + fuelItemStack +
                 ", input=" + input +
                 ", output=" + output +
                 ", cookTime=" + cookTime +
@@ -386,7 +388,7 @@ public class Furnace extends Machine implements PropertyHolder<FurnaceProperties
         result.put("cookTime", this.cookTime);
         result.put("fuelTime", this.fuelTime);
         result.put("xp", this.experience);
-        result.put("fuel", this.fuel);
+        result.put("fuel", this.fuelItemStack);
         result.put("input", this.input);
         result.put("output", this.output);
         return result;

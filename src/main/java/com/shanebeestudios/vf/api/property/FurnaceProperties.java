@@ -5,6 +5,7 @@ import com.shanebeestudios.vf.api.util.Util;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.SerializableAs;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
@@ -16,6 +17,7 @@ import java.util.Objects;
  * <p>Used to manipulate the speed properties of a furnace</p>
  */
 @SuppressWarnings({"unused", "SameParameterValue"})
+@SerializableAs("furnace_properties")
 public class FurnaceProperties extends Properties implements Keyed, ConfigurationSerializable {
 
     /**
