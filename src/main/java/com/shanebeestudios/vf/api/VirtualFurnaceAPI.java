@@ -6,6 +6,7 @@ import com.shanebeestudios.vf.api.task.MachineTick;
 import com.shanebeestudios.vf.api.task.TileTick;
 import com.shanebeestudios.vf.api.tile.FurnaceTile;
 import com.shanebeestudios.vf.api.util.Util;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.Plugin;
@@ -70,7 +71,7 @@ public class VirtualFurnaceAPI {
             return;
         }
         if (!disableMetrics) {
-            new Metrics(javaPlugin, 7021, this);
+            new Metrics(javaPlugin, 7021);
         }
         this.recipeManager = new RecipeManager();
         this.furnaceManager = new FurnaceManager(this);
