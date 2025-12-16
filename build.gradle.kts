@@ -5,7 +5,7 @@ plugins {
 }
 
 // VirtualFurnace version
-version = "1.1.1"
+version = "1.1.2"
 group = "com.github.ShaneBeeStudios"
 val apiVersion = "1.13"
 
